@@ -1,4 +1,4 @@
-defmodule FunWithFlags.Gate do
+defmodule ForkWithFlags.Gate do
   @moduledoc """
   Represents a feature flag gate, that is one of several conditions
   attached to a feature flag.
@@ -6,7 +6,7 @@ defmodule FunWithFlags.Gate do
   This module is not meant to be used directly.
   """
 
-  alias FunWithFlags.{Actor, Group}
+  alias ForkWithFlags.{Actor, Group}
 
   defmodule InvalidGroupNameError do
     defexception [:message]
@@ -18,7 +18,7 @@ defmodule FunWithFlags.Gate do
 
 
   defstruct [:type, :for, :enabled]
-  @type t :: %FunWithFlags.Gate{type: atom, for: (nil | String.t), enabled: boolean}
+  @type t :: %ForkWithFlags.Gate{type: atom, for: (nil | String.t), enabled: boolean}
   @typep options :: Keyword.t
 
   @doc false

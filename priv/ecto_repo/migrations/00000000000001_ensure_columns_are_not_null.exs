@@ -1,4 +1,4 @@
-defmodule FunWithFlags.Dev.EctoRepo.Migrations.EnsureColumnsAreNotNull do
+defmodule ForkWithFlags.Dev.EctoRepo.Migrations.EnsureColumnsAreNotNull do
   use Ecto.Migration
   #
   # Use this migration to add the `not null` constraints to the

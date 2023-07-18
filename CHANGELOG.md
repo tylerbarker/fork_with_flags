@@ -13,7 +13,7 @@
 
 * Add support for Elixir 1.14. Drop support for Elixir 1.11. Elixir >= 1.12 is now required. Dropping support for older versions of Elixir simply means that this package is no longer tested with them in CI, and that compatibility issues are not considered bugs.
 * Drop support for Erlang/OTP 22, and Erlang/OTP >= 23 is now required. Dropping support for older versions of Erlang/OTP simply means that this package is not tested with them in CI, and that no compatibility issues are considered bugs.
-* Ecto persistence adapter: FunWithFlags will now pass a custom option when using the [Ecto Repo Query API](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#query-api): `[fun_with_flags: true]`. This is done to make it easier to identify FunWithFlags queries when working with Ecto customization hooks, e.g. the [`Ecto.Repo.prepare_query/3` callback](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#c:prepare_query/3). (Thanks [SteffenDE](https://github.com/SteffenDE), [pull/143](https://github.com/tompave/fun_with_flags/pull/143))
+* Ecto persistence adapter: ForkWithFlags will now pass a custom option when using the [Ecto Repo Query API](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#query-api): `[fun_with_flags: true]`. This is done to make it easier to identify ForkWithFlags queries when working with Ecto customization hooks, e.g. the [`Ecto.Repo.prepare_query/3` callback](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#c:prepare_query/3). (Thanks [SteffenDE](https://github.com/SteffenDE), [pull/143](https://github.com/tompave/fun_with_flags/pull/143))
 * Redis persistence adapter: added support to configure Redis with a `{"redis URL", [...kw opts]}` tuple, [as is supported in Redix itself](https://hexdocs.pm/redix/1.2.0/Redix.html#start_link/2). (Thanks [iamvery](https://github.com/iamvery), [pull/145](https://github.com/tompave/fun_with_flags/pull/145))
 
 ## v1.9.0
@@ -27,7 +27,7 @@
 
 ## v1.8.1
 
-* Lock `postgrex` dependency to `< 0.16`. Version `0.16` requires Elixir 1.11 ([changelog](https://github.com/elixir-ecto/postgrex/blob/master/CHANGELOG.md#v0160-2022-01-23)) and it doesn't compile with Elixit 1.10, which FunWithFlags still supports.
+* Lock `postgrex` dependency to `< 0.16`. Version `0.16` requires Elixir 1.11 ([changelog](https://github.com/elixir-ecto/postgrex/blob/master/CHANGELOG.md#v0160-2022-01-23)) and it doesn't compile with Elixit 1.10, which ForkWithFlags still supports.
 
 ## v1.8.0
 
@@ -35,9 +35,9 @@
 * Removed all uses of [`defdelegate/2`](https://hexdocs.pm/elixir/1.13.0/Kernel.html#defdelegate/2). They caused some references to configured modules (that can change according to the config) to be reified at compile time, which lead to unexpected behaviour. They've been replaced with plain old function definitions that do the same job. (Thanks [connorlay](https://github.com/connorlay), [pull/111](https://github.com/tompave/fun_with_flags/pull/111).)
 * Local dev: Update the config for the library to use [`Config`](https://hexdocs.pm/elixir/1.13.0/Config.html) instead of the deprecated [`Mix.Config`](https://hexdocs.pm/mix/1.13.0/Mix.Config.html). For the avoidance of doubt: this has no effect when using the package in your projects, because the `config/*.exs` files are not present in the bundles downloaded from Hex.pm.
 * Use [`Application.compile_env/3`](https://hexdocs.pm/elixir/1.13.0/Application.html#compile_env/3) to read the cache configuration at compile-time, which is used to define a module attribute (therefore, set at compile-time). That part of the config is compiled into a module attribute for performance reasons, and it has been a long standing issue because users of the package would get confused by their config changes not being reflected in an already compiled application ([link to relevant section in previous version of the readme](https://github.com/tompave/fun_with_flags/tree/v1.7.0#configuration-changes-have-no-effect-in-mix_envdev)). Now, if the relevant configuration changes, users will get a [clear error](https://github.com/elixir-lang/elixir/blob/v1.10/CHANGELOG.md#tracking-of-compile-time-configuration).
-* Improve error handling in different layers of the package. From the persistence adapters all the way to the public functions of the top-level module. In practice, this means that some situations that would have caused a `MatchError` now instead will bubble up an error tuple. Most importantly, this does **not** affect the signature or behaviour of the `FunWithFlags.enabled?/2` function, which continues to return a simple boolean. ([pull/120](https://github.com/tompave/fun_with_flags/pull/120))
+* Improve error handling in different layers of the package. From the persistence adapters all the way to the public functions of the top-level module. In practice, this means that some situations that would have caused a `MatchError` now instead will bubble up an error tuple. Most importantly, this does **not** affect the signature or behaviour of the `ForkWithFlags.enabled?/2` function, which continues to return a simple boolean. ([pull/120](https://github.com/tompave/fun_with_flags/pull/120))
 * Typespec improvements. These include new typespecs for previously unspecced functions, amended typespecs for the new error tuples that are now bubbled up (see previous point) and fixed typespec that incorrectly ignored a returned error tuple. ([pull/120](https://github.com/tompave/fun_with_flags/pull/120))
-* The typespecs for the `FunWithFlags.Store.Persistence` Elixir behaviour have been updated (see previous point). Users of the package who implemented their own custom persistence adapters are encouraged to double-check that these respect the typespecs. ([pull/120](https://github.com/tompave/fun_with_flags/pull/120))
+* The typespecs for the `ForkWithFlags.Store.Persistence` Elixir behaviour have been updated (see previous point). Users of the package who implemented their own custom persistence adapters are encouraged to double-check that these respect the typespecs. ([pull/120](https://github.com/tompave/fun_with_flags/pull/120))
 
 ## v1.7.0
 
@@ -46,8 +46,8 @@
 * Added support for the Erlang [dialyzer](https://erlang.org/doc/man/dialyzer.html) (via the [dialyxir](https://hex.pm/packages/dialyxir) package).
 * Addressed all dialyzer warnings. Fixed some incorrect typespecs and simplified the implementation of some functions.
 * Miscellaneous documentation fixes and improvements. (Thanks [kianmeng](https://github.com/kianmeng), [pull/89](https://github.com/tompave/fun_with_flags/pull/89), [pull/90](https://github.com/tompave/fun_with_flags/pull/90) and [pull/112](https://github.com/tompave/fun_with_flags/pull/112).)
-* Documented the `FunWithFlags.Store.Cache` module, and its `Cache.flush/0` and `Cache.dump/0` functions. They're now part of the public API of the package.
-* Introduced a new `FunWithFlags.Supervisor` module to manage the supervision tree for the package. The supervision strategy and configuration are unchanged, and host applications don't need to do anything to upgrade. However, this module is part of the public API of the package and can be used to better control the start behaviour of FunWithFlags. This has also been documented [in a new section of the readme](https://github.com/tompave/fun_with_flags#application-start-behaviour).
+* Documented the `ForkWithFlags.Store.Cache` module, and its `Cache.flush/0` and `Cache.dump/0` functions. They're now part of the public API of the package.
+* Introduced a new `ForkWithFlags.Supervisor` module to manage the supervision tree for the package. The supervision strategy and configuration are unchanged, and host applications don't need to do anything to upgrade. However, this module is part of the public API of the package and can be used to better control the start behaviour of ForkWithFlags. This has also been documented [in a new section of the readme](https://github.com/tompave/fun_with_flags#application-start-behaviour).
 * Internal changes to stop using an undocumented feature of Elixir that will go away in future versions. This affects how the function to calculate Actor scores for the %-of-actors gate is invoked, but that's an internal change, so it won't affect users of the package unless they're using undocumented features. (Thanks [kelvinst](https://github.com/kelvinst), [pull/105](https://github.com/tompave/fun_with_flags/pull/105).)
 
 ## v1.6.0
@@ -68,7 +68,7 @@
 * Drop support for Erlang/OTP 20, and Erlang/OTP >= 21 is now required. An older Erlang/OTP might still work with older versions of Elixir, but Elixir 1.10 requires Erlang/OTP >= 21. Dropping support for older versions of Erlang/OTP simply means that this package is not tested with them in CI, and that no compatibility issues are considered bugs.
 * Upgrade Phoenix.PubSub dependency to 2.0. This provides compatibility with Phoenix 1.5.
 * Typespec improvements. (Thanks [skylerparr](https://github.com/skylerparr), [pull/57](https://github.com/tompave/fun_with_flags/pull/57))
-* Internal changes to how flag data is cached in the ETS table. This has no effect on the functionality of the package, with two exceptions. First, the `cache: [ttl: seconds]` config value is not memoized anymore and it can be changed without recompiling. Second, since the TTL is now stored with the ETS entries, old and new ETS data is not compatible; this is not an issue if you restart/rotate your application nodes/instances when deploying, but it will be an issue if you perform [hot code upgrades](https://hexdocs.pm/mix/1.9.4/Mix.Tasks.Release.html#module-hot-code-upgrades). In that case, you have to first empty the ETS table, for example with `FunWithFlags.Store.Cache.flush/0`.
+* Internal changes to how flag data is cached in the ETS table. This has no effect on the functionality of the package, with two exceptions. First, the `cache: [ttl: seconds]` config value is not memoized anymore and it can be changed without recompiling. Second, since the TTL is now stored with the ETS entries, old and new ETS data is not compatible; this is not an issue if you restart/rotate your application nodes/instances when deploying, but it will be an issue if you perform [hot code upgrades](https://hexdocs.pm/mix/1.9.4/Mix.Tasks.Release.html#module-hot-code-upgrades). In that case, you have to first empty the ETS table, for example with `ForkWithFlags.Store.Cache.flush/0`.
 * New config option to set a custom name for the DB table when using the Ecto persistence adapter. (Thanks [BobbyMcWho](https://github.com/BobbyMcWho), [pull/64](https://github.com/tompave/fun_with_flags/pull/64) and [pull/77](https://github.com/tompave/fun_with_flags/pull/77))
 
 ## v1.4.1
@@ -80,12 +80,12 @@
 
 This release focuses on making it easier to extend the package, for example with custom persistence adapters.
 
-* Define a [behaviour](https://hexdocs.pm/elixir/typespecs.html#behaviours) in the `FunWithFlags.Store.Persistence` module that can be implemented by custom persistence adapters. The builtin Redis and Ecto adapters now formally implement this new behaviour.
+* Define a [behaviour](https://hexdocs.pm/elixir/typespecs.html#behaviours) in the `ForkWithFlags.Store.Persistence` module that can be implemented by custom persistence adapters. The builtin Redis and Ecto adapters now formally implement this new behaviour.
 * Refactor how cache-busting change notifications are published: move the logic out of the two builtin persistence adapters and into the level above them. While this is just an internal change, it narrows the responsibilities of the persistence adapters and simplifies implementing custom ones.
 * Update the supervision tree to use [Elixir v1.5 style child specs](https://github.com/elixir-lang/elixir/blob/v1.5/CHANGELOG.md#streamlined-child-specs).
 * Print a helpful error if a project is configured to use a persistence adapter without including its dependency packages. This mirrors what happens when the dependencies for a notifications adapter are missing.
 * Document the `Flag` and `Gate` types, previously private.
-* Redis persistence: relax Redix version lock to `~> 0.9`, which allows to use Redix `0.10`. It was previously locked to `~> 0.9.1` because of breaking changes in the last few Redix minor version releases, but going forward if it happens again it can be handled with a patch level release on FunWithFlags.
+* Redis persistence: relax Redix version lock to `~> 0.9`, which allows to use Redix `0.10`. It was previously locked to `~> 0.9.1` because of breaking changes in the last few Redix minor version releases, but going forward if it happens again it can be handled with a patch level release on ForkWithFlags.
 
 ## v1.3.0
 
@@ -97,7 +97,7 @@ This release focuses on making it easier to extend the package, for example with
 
 ## v1.2.0
 
-* Redis persistence: upgrade to Redix 0.9, which deprecates Redix.PubSub. The pubsub capabilities are now part of the base Redix package. This means that FunWithFlags also needs to drop the dependency on Redix.PubSub.
+* Redis persistence: upgrade to Redix 0.9, which deprecates Redix.PubSub. The pubsub capabilities are now part of the base Redix package. This means that ForkWithFlags also needs to drop the dependency on Redix.PubSub.
 * Compatibility updates in the tests for Elixir 1.8.
 
 There is no other change in this release, but this is a minor version bump because upgrading Redix and dropping Redix.PubSub will require applications to also update their dependencies.
@@ -115,7 +115,7 @@ There is no other change in this release, but this is a minor version bump becau
 
 This release introduces the last two gates that were initially planned and marks a milestone for the project. The API is now stable, and the project can graduate to `1.0.0`.
 
-This release doesn't introduce any breaking change, however, and users of the library should be able to upgrade without problems. If you're also using [`FunWithFlags.UI`](https://github.com/tompave/fun_with_flags_ui) then make sure to also upgrade that to version `0.4.0`, which adds GUI support for the new features.
+This release doesn't introduce any breaking change, however, and users of the library should be able to upgrade without problems. If you're also using [`ForkWithFlags.UI`](https://github.com/tompave/fun_with_flags_ui) then make sure to also upgrade that to version `0.4.0`, which adds GUI support for the new features.
 
 New Gates:
 
@@ -126,7 +126,7 @@ New Gates:
 ## v0.11.0
 
 * Add ability to clear the boolean gate only (useful for debugging).
-* Added `FunWithFlags.get_flag/1`, to retrieve a flag struct. Useful for debugging.
+* Added `ForkWithFlags.get_flag/1`, to retrieve a flag struct. Useful for debugging.
 * Internal improvements.
 
 ## v0.10.1
@@ -140,7 +140,7 @@ Improvements:
 Possibly Breaking Changes:
 
 * Allow binaries _and_ atoms as group gate names. Binaries are now preferred (atom group names are internally converted, stored and retrieved as binaries) and atoms are still allowed for retro-compatibility.  
-While calling `FunWithFlags.enable(:foo, for_group: :bar)` is still allowed and continues to work as before, this change will impact implementations of the `FunWithFlags.Group` protocol that assume
+While calling `ForkWithFlags.enable(:foo, for_group: :bar)` is still allowed and continues to work as before, this change will impact implementations of the `ForkWithFlags.Group` protocol that assume
 that the group name is passed as an atom.  
 To safely upgrade, these implementations should be changed to work with the group names passed as a binary instead. See the [update to the protocol implementation used in the tests](https://github.com/tompave/fun_with_flags/pull/13/files#diff-8c1bcfc3d51e8d863953ac5b57f0da2b) for an example.
 
@@ -195,8 +195,8 @@ Bug fixes:
 
 New Features:
 
-* `FunWithFlags.all_flags/0` is now public and documented.
-* Added `FunWithFlags.all_flag_names/0`, public and documented.
+* `ForkWithFlags.all_flags/0` is now public and documented.
+* Added `ForkWithFlags.all_flag_names/0`, public and documented.
 * Added proper log statements via the Elixir `Logger`. Setting the log level to `debug` will print cache busting info, for example.
 
 Internal changes:
@@ -209,8 +209,8 @@ Internal changes:
 
 New features:
 
-* Added `FunWithFlags.clear/2` to delete a specific gate or an entire flag. This is useful if you don't need an actor or group override and want to use the default boolean rule instead. Clearing a flag or a gate uses the same PubSub cache busting functionality used when updating a flag.
-* Added `FunWithFlags.all_flags/0`, to return a list of all the flags stored in Redis. Undocumented because it's meant to build a GUI.
+* Added `ForkWithFlags.clear/2` to delete a specific gate or an entire flag. This is useful if you don't need an actor or group override and want to use the default boolean rule instead. Clearing a flag or a gate uses the same PubSub cache busting functionality used when updating a flag.
+* Added `ForkWithFlags.all_flags/0`, to return a list of all the flags stored in Redis. Undocumented because it's meant to build a GUI.
 
 ## v0.5.0
 

@@ -1,12 +1,12 @@
-defmodule FunWithFlags.Mixfile do
+defmodule ForkWithFlags.Mixfile do
   use Mix.Project
 
-  @source_url "https://github.com/tompave/fun_with_flags"
+  @source_url "https://github.com/tylerbarker/fork_with_flags"
   @version "1.11.0"
 
   def project do
     [
-      app: :fun_with_flags,
+      app: :fork_with_flags,
       version: @version,
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env),
@@ -24,7 +24,7 @@ defmodule FunWithFlags.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: extra_applications(Mix.env),
-     mod: {FunWithFlags.Application, []}]
+     mod: {ForkWithFlags.Application, []}]
   end
 
   defp extra_applications(:test), do: local_extra_applications()
@@ -227,7 +227,7 @@ defmodule FunWithFlags.Mixfile do
       ]
     )
   end
-  
+
   # Runs the integration tests only.
   # Cache disabled, Ecto+PostgreSQL as persistent store and Phoenix.PubSub as broker.
   #
@@ -257,7 +257,7 @@ defmodule FunWithFlags.Mixfile do
       ]
     )
   end
-  
+
   # Runs the integration tests only.
   # Cache disabled, Ecto+SQLite as persistent store and Phoenix.PubSub as broker.
   #
@@ -279,14 +279,15 @@ defmodule FunWithFlags.Mixfile do
 
   defp description do
     """
-    FunWithFlags, a flexible and fast feature toggle library for Elixir.
+    ForkWithFlags, a flexible and fast feature toggle library for Elixir.
     """
   end
 
   defp package do
     [
       maintainers: [
-        "Tommaso Pavese"
+        "Tommaso Pavese",
+        "Tyler Barker"
       ],
       licenses: [
         "MIT"
@@ -301,7 +302,7 @@ defmodule FunWithFlags.Mixfile do
   defp docs do
     [
       extras: ["README.md", "CHANGELOG.md"],
-      main: "FunWithFlags",
+      main: "ForkWithFlags",
       source_url: @source_url,
       source_ref: "v#{@version}"
     ]

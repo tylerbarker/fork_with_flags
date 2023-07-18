@@ -1,12 +1,12 @@
 if Code.ensure_loaded?(Redix) do
 
-defmodule FunWithFlags.Store.Persistent.Redis do
+defmodule ForkWithFlags.Store.Persistent.Redis do
   @moduledoc false
 
-  @behaviour FunWithFlags.Store.Persistent
+  @behaviour ForkWithFlags.Store.Persistent
 
-  alias FunWithFlags.{Config, Gate}
-  alias FunWithFlags.Store.Serializer.Redis, as: Serializer
+  alias ForkWithFlags.{Config, Gate}
+  alias ForkWithFlags.Store.Serializer.Redis, as: Serializer
 
   @conn __MODULE__
   @conn_options [name: @conn, sync_connect: false]

@@ -1,14 +1,14 @@
 if Code.ensure_loaded?(Redix.PubSub) do
 
-defmodule FunWithFlags.Notifications.Redis do
+defmodule ForkWithFlags.Notifications.Redis do
   @moduledoc false
   use GenServer
   require Logger
-  alias FunWithFlags.{Config, Store}
+  alias ForkWithFlags.{Config, Store}
 
   # Use the Redis conn from the persistence module to
   # issue Redis commands (to publish notification).
-  @write_conn FunWithFlags.Store.Persistent.Redis
+  @write_conn ForkWithFlags.Store.Persistent.Redis
 
   @conn :fun_with_flags_notifications
   @conn_options [name: @conn, sync_connect: false]
@@ -66,7 +66,7 @@ defmodule FunWithFlags.Notifications.Redis do
 
 
   def publish_change(flag_name) do
-    Logger.debug fn -> "FunWithFlags.Notifications: publish change for '#{flag_name}'" end
+    Logger.debug fn -> "ForkWithFlags.Notifications: publish change for '#{flag_name}'" end
     Task.start fn() ->
       Redix.command(
         @write_conn,
@@ -109,7 +109,7 @@ defmodule FunWithFlags.Notifications.Redis do
   end
 
   def handle_info({:redix_pubsub, _from, ref, :disconnected, %{error: error}}, state = {_, ref}) do
-    Logger.error("FunWithFlags: Redis pub-sub connection interrupted, reason: '#{Redix.ConnectionError.message(error)}'.")
+    Logger.error("ForkWithFlags: Redis pub-sub connection interrupted, reason: '#{Redix.ConnectionError.message(error)}'.")
     {:noreply, state}
   end
 
@@ -135,7 +135,7 @@ defmodule FunWithFlags.Notifications.Redis do
         nil
       [_id, name] ->
         # received message from another node, reload the flag
-        Logger.debug fn -> "FunWithFlags: received change notification for flag '#{name}'" end
+        Logger.debug fn -> "ForkWithFlags: received change notification for flag '#{name}'" end
         Task.start(Store, :reload, [String.to_atom(name)])
       _ ->
         # invalid message, ignore

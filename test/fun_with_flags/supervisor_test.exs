@@ -1,16 +1,16 @@
-defmodule FunWithFlags.SupervisorTest do
-  use FunWithFlags.TestCase, async: false
+defmodule ForkWithFlags.SupervisorTest do
+  use ForkWithFlags.TestCase, async: false
 
-  alias FunWithFlags.Config
+  alias ForkWithFlags.Config
 
   test "the auto-generated child_spec/1" do
     expected = %{
-      id: FunWithFlags.Supervisor,
-      start: {FunWithFlags.Supervisor, :start_link, [nil]},
+      id: ForkWithFlags.Supervisor,
+      start: {ForkWithFlags.Supervisor, :start_link, [nil]},
       type: :supervisor
     }
 
-    assert ^expected = FunWithFlags.Supervisor.child_spec(nil)
+    assert ^expected = ForkWithFlags.Supervisor.child_spec(nil)
   end
 
   describe "initializing the config for the children" do
@@ -23,9 +23,9 @@ defmodule FunWithFlags.SupervisorTest do
           %{intensity: 3, period: 5, strategy: :one_for_one},
           [
             %{
-              id: FunWithFlags.Store.Cache,
+              id: ForkWithFlags.Store.Cache,
               restart: :permanent,
-              start: {FunWithFlags.Store.Cache, :start_link, []},
+              start: {ForkWithFlags.Store.Cache, :start_link, []},
               type: :worker
             },
             %{
@@ -36,16 +36,16 @@ defmodule FunWithFlags.SupervisorTest do
                    host: "localhost",
                    port: 6379,
                    database: 5,
-                   name: FunWithFlags.Store.Persistent.Redis,
+                   name: ForkWithFlags.Store.Persistent.Redis,
                    sync_connect: false
                  ]
                ]},
               type: :worker
             },
             %{
-              id: FunWithFlags.Notifications.Redis,
+              id: ForkWithFlags.Notifications.Redis,
               restart: :permanent,
-              start: {FunWithFlags.Notifications.Redis, :start_link, [
+              start: {ForkWithFlags.Notifications.Redis, :start_link, [
                 [host: "localhost", port: 6379, database: 5, name: :fun_with_flags_notifications, sync_connect: false]
               ]},
               type: :worker
@@ -54,7 +54,7 @@ defmodule FunWithFlags.SupervisorTest do
         }
       }
 
-      assert ^expected = FunWithFlags.Supervisor.init(nil)
+      assert ^expected = ForkWithFlags.Supervisor.init(nil)
     end
 
     @tag :redis_persistence
@@ -66,9 +66,9 @@ defmodule FunWithFlags.SupervisorTest do
           %{intensity: 3, period: 5, strategy: :one_for_one},
           [
             %{
-              id: FunWithFlags.Store.Cache,
+              id: ForkWithFlags.Store.Cache,
               restart: :permanent,
-              start: {FunWithFlags.Store.Cache, :start_link, []},
+              start: {ForkWithFlags.Store.Cache, :start_link, []},
               type: :worker
             },
             %{
@@ -79,23 +79,23 @@ defmodule FunWithFlags.SupervisorTest do
                    host: "localhost",
                    port: 6379,
                    database: 5,
-                   name: FunWithFlags.Store.Persistent.Redis,
+                   name: ForkWithFlags.Store.Persistent.Redis,
                    sync_connect: false
                  ]
                ]},
               type: :worker
             },
             %{
-              id: FunWithFlags.Notifications.PhoenixPubSub,
+              id: ForkWithFlags.Notifications.PhoenixPubSub,
               restart: :permanent,
-              start: {FunWithFlags.Notifications.PhoenixPubSub, :start_link, []},
+              start: {ForkWithFlags.Notifications.PhoenixPubSub, :start_link, []},
               type: :worker
             }
           ]
         }
       }
 
-      assert ^expected = FunWithFlags.Supervisor.init(nil)
+      assert ^expected = ForkWithFlags.Supervisor.init(nil)
     end
 
     @tag :ecto_persistence
@@ -107,22 +107,22 @@ defmodule FunWithFlags.SupervisorTest do
           %{intensity: 3, period: 5, strategy: :one_for_one},
           [
             %{
-              id: FunWithFlags.Store.Cache,
+              id: ForkWithFlags.Store.Cache,
               restart: :permanent,
-              start: {FunWithFlags.Store.Cache, :start_link, []},
+              start: {ForkWithFlags.Store.Cache, :start_link, []},
               type: :worker
             },
             %{
-              id: FunWithFlags.Notifications.PhoenixPubSub,
+              id: ForkWithFlags.Notifications.PhoenixPubSub,
               restart: :permanent,
-              start: {FunWithFlags.Notifications.PhoenixPubSub, :start_link, []},
+              start: {ForkWithFlags.Notifications.PhoenixPubSub, :start_link, []},
               type: :worker
             }
           ]
         }
       }
 
-      assert ^expected = FunWithFlags.Supervisor.init(nil)
+      assert ^expected = ForkWithFlags.Supervisor.init(nil)
     end
   end
 
@@ -133,13 +133,13 @@ defmodule FunWithFlags.SupervisorTest do
       original_cache_config = Config.ets_cache_config()
 
       # Disable the cache for these tests.
-      Application.put_all_env(fun_with_flags: [cache: [
+      Application.put_all_env(fork_with_flags: [cache: [
         enabled: false, ttl: original_cache_config[:ttl]
       ]])
 
       # Restore the original config
       on_exit fn ->
-        Application.put_all_env(fun_with_flags: [cache: original_cache_config])
+        Application.put_all_env(fork_with_flags: [cache: original_cache_config])
         assert ^original_cache_config = Config.ets_cache_config()
       end
     end
@@ -160,7 +160,7 @@ defmodule FunWithFlags.SupervisorTest do
                    host: "localhost",
                    port: 6379,
                    database: 5,
-                   name: FunWithFlags.Store.Persistent.Redis,
+                   name: ForkWithFlags.Store.Persistent.Redis,
                    sync_connect: false
                  ]
                ]},
@@ -170,7 +170,7 @@ defmodule FunWithFlags.SupervisorTest do
         }
       }
 
-      assert ^expected = FunWithFlags.Supervisor.init(nil)
+      assert ^expected = ForkWithFlags.Supervisor.init(nil)
     end
 
     @tag :redis_persistence
@@ -189,7 +189,7 @@ defmodule FunWithFlags.SupervisorTest do
                    host: "localhost",
                    port: 6379,
                    database: 5,
-                   name: FunWithFlags.Store.Persistent.Redis,
+                   name: ForkWithFlags.Store.Persistent.Redis,
                    sync_connect: false
                  ]
                ]},
@@ -199,7 +199,7 @@ defmodule FunWithFlags.SupervisorTest do
         }
       }
 
-      assert ^expected = FunWithFlags.Supervisor.init(nil)
+      assert ^expected = ForkWithFlags.Supervisor.init(nil)
     end
 
     @tag :ecto_persistence
@@ -213,7 +213,7 @@ defmodule FunWithFlags.SupervisorTest do
         }
       }
 
-      assert ^expected = FunWithFlags.Supervisor.init(nil)
+      assert ^expected = ForkWithFlags.Supervisor.init(nil)
     end
   end
 end

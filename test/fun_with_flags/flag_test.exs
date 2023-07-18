@@ -1,7 +1,7 @@
-defmodule FunWithFlags.FlagTest do
-  use FunWithFlags.TestCase, async: true
+defmodule ForkWithFlags.FlagTest do
+  use ForkWithFlags.TestCase, async: true
 
-  alias FunWithFlags.{Flag,Gate}
+  alias ForkWithFlags.{Flag,Gate}
 
   describe "new(name)" do
     test "it returns a new flag struct" do
@@ -68,7 +68,7 @@ defmodule FunWithFlags.FlagTest do
 
 
   describe "enabled?(flag, for: item)" do
-    alias FunWithFlags.TestUser
+    alias ForkWithFlags.TestUser
 
     setup do
       john = %TestUser{id: 42, email: "john@snow.nw", groups: [:starks, :nights_watch]}

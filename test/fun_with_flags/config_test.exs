@@ -1,8 +1,8 @@
-defmodule FunWithFlags.ConfigTest do
-  use FunWithFlags.TestCase, async: true
-  alias FunWithFlags.Config
+defmodule ForkWithFlags.ConfigTest do
+  use ForkWithFlags.TestCase, async: true
+  alias ForkWithFlags.Config
 
-  import FunWithFlags.TestUtils, only: [
+  import ForkWithFlags.TestUtils, only: [
     configure_redis_with: 1,
     ensure_default_redis_config_in_app_env: 0,
     reset_app_env_to_default_redis_config: 0,
@@ -61,7 +61,7 @@ defmodule FunWithFlags.ConfigTest do
     assert true == Config.cache?
 
     # can be configured
-    Application.put_all_env(fun_with_flags: [cache: [enabled: false]])
+    Application.put_all_env(:fork_with_flags [cache: [enabled: false]])
     assert false == Config.cache?
 
     # cleanup
@@ -75,7 +75,7 @@ defmodule FunWithFlags.ConfigTest do
     assert 60 = Config.cache_ttl
 
     # can be configured
-    Application.put_all_env(fun_with_flags: [cache: [ttl: 3600]])
+    Application.put_all_env(:fork_with_flags [cache: [ttl: 3600]])
     assert 3600 = Config.cache_ttl
 
     # cleanup
@@ -88,9 +88,9 @@ defmodule FunWithFlags.ConfigTest do
   test "store_module_determined_at_compile_time()" do
     # This is not great, but testing compile time stuff is tricky.
     if Config.cache?() do
-      assert FunWithFlags.Store = Config.store_module_determined_at_compile_time()
+      assert ForkWithFlags.Store = Config.store_module_determined_at_compile_time()
     else
-      assert FunWithFlags.SimpleStore = Config.store_module_determined_at_compile_time()
+      assert ForkWithFlags.SimpleStore = Config.store_module_determined_at_compile_time()
     end
   end
 
@@ -106,7 +106,7 @@ defmodule FunWithFlags.ConfigTest do
   describe "When we are persisting data in Redis" do
     @describetag :redis_persistence
     test "persistence_adapter() returns the Redis module" do
-      assert FunWithFlags.Store.Persistent.Redis = Config.persistence_adapter
+      assert ForkWithFlags.Store.Persistent.Redis = Config.persistence_adapter
     end
 
     test "persist_in_ecto? returns false" do
@@ -114,14 +114,14 @@ defmodule FunWithFlags.ConfigTest do
     end
 
     test "ecto_repo() returns the null repo" do
-      assert FunWithFlags.NullEctoRepo = Config.ecto_repo
+      assert ForkWithFlags.NullEctoRepo = Config.ecto_repo
     end
   end
 
   describe "When we are persisting data in Ecto" do
     @describetag :ecto_persistence
     test "persistence_adapter() returns the Ecto module" do
-      assert FunWithFlags.Store.Persistent.Ecto = Config.persistence_adapter
+      assert ForkWithFlags.Store.Persistent.Ecto = Config.persistence_adapter
     end
 
     test "persist_in_ecto? returns true" do
@@ -129,7 +129,7 @@ defmodule FunWithFlags.ConfigTest do
     end
 
     test "ecto_repo() returns a repo" do
-      assert FunWithFlags.Dev.EctoRepo = Config.ecto_repo
+      assert ForkWithFlags.Dev.EctoRepo = Config.ecto_repo
     end
   end
 
@@ -143,7 +143,7 @@ defmodule FunWithFlags.ConfigTest do
     @describetag :redis_pubsub
 
     test "notifications_adapter() returns the Redis module" do
-      assert FunWithFlags.Notifications.Redis = Config.notifications_adapter
+      assert ForkWithFlags.Notifications.Redis = Config.notifications_adapter
     end
 
     test "phoenix_pubsub? returns false" do
@@ -159,7 +159,7 @@ defmodule FunWithFlags.ConfigTest do
     @describetag :phoenix_pubsub
 
     test "notifications_adapter() returns the Redis module" do
-      assert FunWithFlags.Notifications.PhoenixPubSub = Config.notifications_adapter
+      assert ForkWithFlags.Notifications.PhoenixPubSub = Config.notifications_adapter
     end
 
     test "phoenix_pubsub? returns true" do
@@ -178,7 +178,7 @@ defmodule FunWithFlags.ConfigTest do
     end
 
     test "returns false if the cache is disabled" do
-      Application.put_all_env(fun_with_flags: [cache: [enabled: false]])
+      Application.put_all_env(:fork_with_flags [cache: [enabled: false]])
       refute Config.change_notifications_enabled?
 
       # cleanup
@@ -189,7 +189,7 @@ defmodule FunWithFlags.ConfigTest do
     test "returns false if no notification adapter is configured" do
       original_adapter = Config.notifications_adapter()
       original_client = Config.pubsub_client
-      Application.put_all_env(fun_with_flags: [cache_bust_notifications: [adapter: nil]])
+      Application.put_all_env(:fork_with_flags [cache_bust_notifications: [adapter: nil]])
       refute Config.change_notifications_enabled?
 
       # cleanup
@@ -200,7 +200,7 @@ defmodule FunWithFlags.ConfigTest do
     test "returns false if it's explicitly disabled" do
       original_adapter = Config.notifications_adapter()
       original_client = Config.pubsub_client
-      Application.put_all_env(fun_with_flags: [cache_bust_notifications: [enabled: false]])
+      Application.put_all_env(:fork_with_flags [cache_bust_notifications: [enabled: false]])
       refute Config.change_notifications_enabled?
 
       # cleanup
@@ -210,11 +210,11 @@ defmodule FunWithFlags.ConfigTest do
   end
 
   defp reset_cache_defaults do
-    Application.put_all_env(fun_with_flags: [cache: [enabled: true, ttl: 60]])
+    Application.put_all_env(:fork_with_flags [cache: [enabled: true, ttl: 60]])
   end
 
   defp reset_notifications_defaults(adapter, client) do
-    Application.put_all_env(fun_with_flags: [
+    Application.put_all_env(:fork_with_flags [
       cache_bust_notifications: [
         enabled: true, adapter: adapter, client: client
       ]

@@ -1,11 +1,11 @@
-defmodule FunWithFlags.Store.Serializer.Redis do
+defmodule ForkWithFlags.Store.Serializer.Redis do
   @moduledoc false
-  alias FunWithFlags.Flag
-  alias FunWithFlags.Gate
+  alias ForkWithFlags.Flag
+  alias ForkWithFlags.Gate
 
   @type redis_hash_pair :: [String.t]
 
-  @spec serialize(FunWithFlags.Gate.t) :: redis_hash_pair
+  @spec serialize(ForkWithFlags.Gate.t) :: redis_hash_pair
 
   def serialize(%Gate{type: :boolean, for: nil, enabled: enabled}) do
     ["boolean", to_string(enabled)]

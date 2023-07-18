@@ -1,11 +1,11 @@
-defmodule FunWithFlags.Supervisor do
+defmodule ForkWithFlags.Supervisor do
   @moduledoc """
   A [Module-based supervisor](https://hexdocs.pm/elixir/Supervisor.html#module-module-based-supervisors).
 
   It implements [`Supervisor.child_spec/1`](https://hexdocs.pm/elixir/Supervisor.html#module-child_spec-1) to describe the supervision tree for the
-  `:fun_with_flags` application.
+  `:fork_with_flags` application.
 
-  This module is used internally by the package when the `:fun_with_flags` OTP
+  This module is used internally by the package when the `:fork_with_flags` OTP
   application starts its own supervision tree, which is the default behavior.
   If that is disabled, the user's host application should use this module to start
   the supervision tree directly.
@@ -19,7 +19,7 @@ defmodule FunWithFlags.Supervisor do
   available in the [readme](readme.html#application-start-behaviour).
   """
 
-  alias FunWithFlags.Config
+  alias ForkWithFlags.Config
   require Logger
 
   # Automatically defines `child_spec/1`.
@@ -43,7 +43,7 @@ defmodule FunWithFlags.Supervisor do
 
   defp children do
     [
-      FunWithFlags.Store.Cache.worker_spec(),
+      ForkWithFlags.Store.Cache.worker_spec(),
       persistence_spec(),
       notifications_spec(),
     ]
@@ -58,7 +58,7 @@ defmodule FunWithFlags.Supervisor do
       adapter.worker_spec()
     rescue
       e in [UndefinedFunctionError] ->
-        Logger.error "FunWithFlags: It looks like you're trying to use #{inspect(adapter)} " <>
+        Logger.error "ForkWithFlags: It looks like you're trying to use #{inspect(adapter)} " <>
          "to persist flags, but you haven't added its optional dependency to the Mixfile " <>
          "of your project."
         reraise e, __STACKTRACE__
@@ -75,7 +75,7 @@ defmodule FunWithFlags.Supervisor do
       Config.change_notifications_enabled? && Config.notifications_adapter.worker_spec()
     rescue
       e in [UndefinedFunctionError] ->
-        Logger.error "FunWithFlags: It looks like you're trying to use #{inspect(Config.notifications_adapter)} " <>
+        Logger.error "ForkWithFlags: It looks like you're trying to use #{inspect(Config.notifications_adapter)} " <>
          "for the cache-busting notifications, but you haven't added its optional dependency to the Mixfile " <>
          "of your project. If you don't need cache-busting notifications, they can be disabled to make this " <>
          "error go away."

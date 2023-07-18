@@ -1,9 +1,9 @@
-defmodule FunWithFlags.TestUtils do
-  alias FunWithFlags.Config
+defmodule ForkWithFlags.TestUtils do
+  alias ForkWithFlags.Config
   import ExUnit.Assertions, only: [assert: 1]
 
   @test_db 5
-  @redis FunWithFlags.Store.Persistent.Redis
+  @redis ForkWithFlags.Store.Persistent.Redis
 
   # Since the flags are saved on shared storage (ETS and
   # Redis), in order to keep the tests isolated _and_ async
@@ -43,18 +43,18 @@ defmodule FunWithFlags.TestUtils do
 
   def clear_cache do
     if Config.cache? do
-      FunWithFlags.Store.Cache.flush()
+      ForkWithFlags.Store.Cache.flush()
     end
   end
 
   defmacro timetravel([by: offset], [do: body]) do
     quote do
-      fake_now = FunWithFlags.Timestamps.now + unquote(offset)
-      # IO.puts("now:      #{FunWithFlags.Timestamps.now}")
+      fake_now = ForkWithFlags.Timestamps.now + unquote(offset)
+      # IO.puts("now:      #{ForkWithFlags.Timestamps.now}")
       # IO.puts("offset:   #{unquote(offset)}")
       # IO.puts("fake_now: #{fake_now}")
 
-      with_mock(FunWithFlags.Timestamps, [
+      with_mock(ForkWithFlags.Timestamps, [
         now: fn() ->
           fake_now
         end,
@@ -72,12 +72,12 @@ defmodule FunWithFlags.TestUtils do
   end
 
   def configure_redis_with(conf) do
-    Application.put_all_env(fun_with_flags: [redis: conf])
-    assert ^conf = Application.get_env(:fun_with_flags, :redis)
+    Application.put_all_env(fork_with_flags: [redis: conf])
+    assert ^conf = Application.get_env(:fork_with_flags, :redis)
   end
 
   def ensure_default_redis_config_in_app_env do
-    assert match?([database: 5], Application.get_env(:fun_with_flags, :redis))
+    assert match?([database: 5], Application.get_env(:fork_with_flags, :redis))
   end
 
   def reset_app_env_to_default_redis_config do

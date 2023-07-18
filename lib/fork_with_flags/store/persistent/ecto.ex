@@ -1,15 +1,15 @@
 if Code.ensure_loaded?(Ecto.Adapters.SQL) do
 
-defmodule FunWithFlags.Store.Persistent.Ecto do
+defmodule ForkWithFlags.Store.Persistent.Ecto do
   @moduledoc false
 
-  @behaviour FunWithFlags.Store.Persistent
+  @behaviour ForkWithFlags.Store.Persistent
 
-  alias FunWithFlags.Gate
-  alias FunWithFlags.Store.Persistent.Ecto.Record
-  alias FunWithFlags.Store.Serializer.Ecto, as: Serializer
+  alias ForkWithFlags.Gate
+  alias ForkWithFlags.Store.Persistent.Ecto.Record
+  alias ForkWithFlags.Store.Serializer.Ecto, as: Serializer
 
-  import FunWithFlags.Config, only: [ecto_repo: 0]
+  import ForkWithFlags.Config, only: [ecto_repo: 0]
   import Ecto.Query
 
   require Logger

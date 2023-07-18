@@ -1,10 +1,10 @@
 if Code.ensure_loaded?(Phoenix.PubSub) do
 
-defmodule FunWithFlags.Notifications.PhoenixPubSub do
+defmodule ForkWithFlags.Notifications.PhoenixPubSub do
   @moduledoc false
   use GenServer
   require Logger
-  alias FunWithFlags.{Config, Store}
+  alias ForkWithFlags.{Config, Store}
 
   @channel "fun_with_flags_changes"
   @max_attempts 5
@@ -39,7 +39,7 @@ defmodule FunWithFlags.Notifications.PhoenixPubSub do
 
 
   def publish_change(flag_name) do
-    Logger.debug fn -> "FunWithFlags.Notifications: publish change for '#{flag_name}'" end
+    Logger.debug fn -> "ForkWithFlags.Notifications: publish change for '#{flag_name}'" end
     Task.start fn() ->
       Phoenix.PubSub.broadcast!(client(), @channel,
         {:fwf_changes, {:updated, flag_name, unique_id()}}
@@ -65,18 +65,18 @@ defmodule FunWithFlags.Notifications.PhoenixPubSub do
       case Phoenix.PubSub.subscribe(client(), @channel) do
         :ok ->
           # All good
-          Logger.debug fn -> "FunWithFlags: Connected to Phoenix.PubSub process #{inspect(client())}" end
+          Logger.debug fn -> "ForkWithFlags: Connected to Phoenix.PubSub process #{inspect(client())}" end
           :ok
         {:error, reason} ->
           # Handled application errors
-          Logger.debug fn -> "FunWithFlags: Cannot subscribe to Phoenix.PubSub process #{inspect(client())} ({:error, #{inspect(reason)}})." end
+          Logger.debug fn -> "ForkWithFlags: Cannot subscribe to Phoenix.PubSub process #{inspect(client())} ({:error, #{inspect(reason)}})." end
           try_again_to_subscribe(attempt)
       end
     rescue
       e ->
         # The pubsub process was probably not running. This happens when using it in Phoenix, as it tries to connect the
         # first time while the application is booting, and the Phoenix.PubSub process is not fully started yet.
-        Logger.debug fn -> "FunWithFlags: Cannot subscribe to Phoenix.PubSub process #{inspect(client())} (exception: #{inspect(e)})." end
+        Logger.debug fn -> "ForkWithFlags: Cannot subscribe to Phoenix.PubSub process #{inspect(client())} (exception: #{inspect(e)})." end
         try_again_to_subscribe(attempt)
     end
   end
@@ -108,7 +108,7 @@ defmodule FunWithFlags.Notifications.PhoenixPubSub do
 
   def handle_info({:fwf_changes, {:updated, name, _}}, unique_id) do
     # received message from another node, reload the flag
-    Logger.debug fn -> "FunWithFlags: received change notification for flag '#{name}'" end
+    Logger.debug fn -> "ForkWithFlags: received change notification for flag '#{name}'" end
     Task.start(Store, :reload, [name])
     {:noreply, unique_id}
   end
@@ -118,7 +118,7 @@ defmodule FunWithFlags.Notifications.PhoenixPubSub do
   # to try again. It will be handled here.
   #
   def handle_info({:subscribe_retry, attempt}, unique_id) do
-    Logger.debug fn -> "FunWithFlags: retrying to subscribe to Phoenix.PubSub, attempt #{attempt}." end
+    Logger.debug fn -> "ForkWithFlags: retrying to subscribe to Phoenix.PubSub, attempt #{attempt}." end
     subscribe(attempt)
     {:noreply, unique_id}
   end

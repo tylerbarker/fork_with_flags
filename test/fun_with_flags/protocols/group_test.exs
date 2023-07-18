@@ -1,7 +1,7 @@
-defmodule FunWithFlags.GroupTest do
-  use FunWithFlags.TestCase, async: true
+defmodule ForkWithFlags.GroupTest do
+  use ForkWithFlags.TestCase, async: true
 
-  alias FunWithFlags.{Group, TestUser}
+  alias ForkWithFlags.{Group, TestUser}
 
   setup do
     user1 = %TestUser{id: 1, email: "bruce@wayne.com"}

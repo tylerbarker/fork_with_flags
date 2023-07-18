@@ -1,16 +1,16 @@
-defmodule FunWithFlags.TestUser do
+defmodule ForkWithFlags.TestUser do
   # A Test user
   defstruct [:id, :email, :name, groups: []]
 end
 
-defimpl FunWithFlags.Actor, for: FunWithFlags.TestUser do
+defimpl ForkWithFlags.Actor, for: ForkWithFlags.TestUser do
   def id(%{id: id}) do
     "user:#{id}"
   end
 end
 
 
-defimpl FunWithFlags.Group, for: FunWithFlags.TestUser do
+defimpl ForkWithFlags.Group, for: ForkWithFlags.TestUser do
   def in?(%{email: email}, "admin") do
     Regex.match?(~r/@wayne.com$/, email)
   end

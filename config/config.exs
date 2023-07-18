@@ -1,9 +1,9 @@
 import Config
 
-# config :fun_with_flags, :persistence,
-#   [adapter: FunWithFlags.Store.Persistent.Redis]
-# config :fun_with_flags, :cache_bust_notifications,
-#   [enabled: true, adapter: FunWithFlags.Notifications.Redis]
+# config :fork_with_flags, :persistence,
+#   [adapter: ForkWithFlags.Store.Persistent.Redis]
+# config :fork_with_flags, :cache_bust_notifications,
+#   [enabled: true, adapter: ForkWithFlags.Notifications.Redis]
 
 
 # -------------------------------------------------
@@ -32,14 +32,14 @@ with_ecto =
 # -------------------------------------------------
 # Configuration
 
-config :fun_with_flags, :cache,
+config :fork_with_flags, :cache,
   enabled: with_cache,
   ttl: 60
 
 
 if with_phx_pubsub do
-  config :fun_with_flags, :cache_bust_notifications, [
-    adapter: FunWithFlags.Notifications.PhoenixPubSub,
+  config :fork_with_flags, :cache_bust_notifications, [
+    adapter: ForkWithFlags.Notifications.PhoenixPubSub,
     client: :fwf_test
   ]
 end
@@ -47,33 +47,33 @@ end
 
 if with_ecto do
   # this library's config
-  config :fun_with_flags, :persistence,
-    adapter: FunWithFlags.Store.Persistent.Ecto,
-    repo: FunWithFlags.Dev.EctoRepo
+  config :fork_with_flags, :persistence,
+    adapter: ForkWithFlags.Store.Persistent.Ecto,
+    repo: ForkWithFlags.Dev.EctoRepo
 
   # To test the compile-time config warnings.
-  # config :fun_with_flags, :persistence,
+  # config :fork_with_flags, :persistence,
   #   ecto_table_name: System.get_env("ECTO_TABLE_NAME", "fun_with_flags_toggles")
 
   # ecto's config
-  config :fun_with_flags, ecto_repos: [FunWithFlags.Dev.EctoRepo]
+  config :fork_with_flags, ecto_repos: [ForkWithFlags.Dev.EctoRepo]
 
-  config :fun_with_flags, FunWithFlags.Dev.EctoRepo,
+  config :fork_with_flags, ForkWithFlags.Dev.EctoRepo,
     database: "fun_with_flags_dev",
     hostname: "localhost",
     pool_size: 10
 
   case System.get_env("RDBMS") do
     "mysql" ->
-      config :fun_with_flags, FunWithFlags.Dev.EctoRepo,
+      config :fork_with_flags, ForkWithFlags.Dev.EctoRepo,
         username: "root",
         password: "root"
     "sqlite" ->
-      config :fun_with_flags, FunWithFlags.Dev.EctoRepo,
+      config :fork_with_flags, ForkWithFlags.Dev.EctoRepo,
         username: "sqlite",
         password: "sqlite"
     _ ->
-      config :fun_with_flags, FunWithFlags.Dev.EctoRepo,
+      config :fork_with_flags, ForkWithFlags.Dev.EctoRepo,
         username: "postgres",
         password: "postgres"
   end

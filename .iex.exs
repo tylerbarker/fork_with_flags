@@ -1,11 +1,11 @@
-import FunWithFlags
-alias FunWithFlags.{Store,Config,Flag,Gate}
-alias FunWithFlags.Store.{Cache,Persistent,Serializer}
-alias FunWithFlags.{Actor,Group}
+import ForkWithFlags
+alias ForkWithFlags.{Store,Config,Flag,Gate}
+alias ForkWithFlags.Store.{Cache,Persistent,Serializer}
+alias ForkWithFlags.{Actor,Group}
 
-alias FunWithFlags.Dev.EctoRepo, as: Repo
-alias FunWithFlags.Store.Persistent.Ecto.Record
-alias FunWithFlags.Supervisor, as: Sup
+alias ForkWithFlags.Dev.EctoRepo, as: Repo
+alias ForkWithFlags.Store.Persistent.Ecto.Record
+alias ForkWithFlags.Supervisor, as: Sup
 
 
 # When calling `respawn` in a iex session, e.g. debugging tests,
@@ -26,7 +26,7 @@ end
 
 if Config.persist_in_ecto? do
   with_safe_restart.(fn ->
-    FunWithFlags.Dev.EctoRepo.start_link()
+    ForkWithFlags.Dev.EctoRepo.start_link()
   end)
 else
   with_safe_restart.(fn ->
@@ -49,7 +49,7 @@ if Config.phoenix_pubsub? do
   end)
 end
 
-alias FunWithFlags.Store.Persistent.Ecto, as: PEcto
+alias ForkWithFlags.Store.Persistent.Ecto, as: PEcto
 
 cacheinfo = fn() ->
   size = :ets.info(:fun_with_flags_cache)[:size]

@@ -1,6 +1,6 @@
-defmodule FunWithFlags do
+defmodule ForkWithFlags do
   @moduledoc """
-  FunWithFlags, the Elixir feature flag library.
+  ForkWithFlags, the Elixir feature flag library.
 
   This module provides the public interface to the library and its API is
   made of three simple methods to enable, disable and query feature flags.
@@ -10,24 +10,24 @@ defmodule FunWithFlags do
   More advanced rules or "gates" are available, and they can be set and queried
   for any term that implements these protocols:
 
-  * The `FunWithFlags.Actor` protocol can be
+  * The `ForkWithFlags.Actor` protocol can be
   implemented for types and structs that should have specific rules. For
   example, in web applications it's common to use a `%User{}` struct or
   equivalent as an actor, or perhaps the current country of the request.
 
-  * The `FunWithFlags.Group` protocol can be
+  * The `ForkWithFlags.Group` protocol can be
   implemented for types and structs that should belong to groups for which
   one wants to enable and disable some flags. For example, one could implement
   the protocol for a `%User{}` struct to identify administrators.
 
 
-  See the [Usage](/fun_with_flags/readme.html#usage) notes for a more detailed
+  See the [Usage](/fork_with_flags/readme.html#usage) notes for a more detailed
   explanation.
   """
 
-  alias FunWithFlags.{Config, Flag, Gate}
+  alias ForkWithFlags.{Config, Flag, Gate}
 
-  @store FunWithFlags.Config.store_module_determined_at_compile_time()
+  @store ForkWithFlags.Config.store_module_determined_at_compile_time()
 
   @type options :: Keyword.t
 
@@ -46,27 +46,27 @@ defmodule FunWithFlags do
 
   ## Examples
 
-  This example relies on the [reference implementation](https://github.com/tompave/fun_with_flags/blob/master/test/support/test_user.ex)
+  This example relies on the [reference implementation](https://github.com/tylerbarker/fork_with_flags/blob/master/test/support/test_user.ex)
   used in the tests.
 
-      iex> alias FunWithFlags.TestUser, as: User
+      iex> alias ForkWithFlags.TestUser, as: User
       iex> harry = %User{id: 1, name: "Harry Potter", groups: ["wizards", "gryffindor"]}
-      iex> FunWithFlags.disable(:elder_wand)
-      iex> FunWithFlags.enable(:elder_wand, for_actor: harry)
-      iex> FunWithFlags.enabled?(:elder_wand)
+      iex> ForkWithFlags.disable(:elder_wand)
+      iex> ForkWithFlags.enable(:elder_wand, for_actor: harry)
+      iex> ForkWithFlags.enabled?(:elder_wand)
       false
-      iex> FunWithFlags.enabled?(:elder_wand, for: harry)
+      iex> ForkWithFlags.enabled?(:elder_wand, for: harry)
       true
       iex> voldemort = %User{id: 7, name: "Tom Riddle", groups: ["wizards", "slytherin"]}
-      iex> FunWithFlags.enabled?(:elder_wand, for: voldemort)
+      iex> ForkWithFlags.enabled?(:elder_wand, for: voldemort)
       false
       iex> filch = %User{id: 88, name: "Argus Filch", groups: ["staff"]}
-      iex> FunWithFlags.enable(:magic_wands, for_group: "wizards")
-      iex> FunWithFlags.enabled?(:magic_wands, for: harry)
+      iex> ForkWithFlags.enable(:magic_wands, for_group: "wizards")
+      iex> ForkWithFlags.enabled?(:magic_wands, for: harry)
       true
-      iex> FunWithFlags.enabled?(:magic_wands, for: voldemort)
+      iex> ForkWithFlags.enabled?(:magic_wands, for: voldemort)
       true
-      iex> FunWithFlags.enabled?(:magic_wands, for: filch)
+      iex> ForkWithFlags.enabled?(:magic_wands, for: filch)
       false
 
   """
@@ -107,53 +107,53 @@ defmodule FunWithFlags do
 
   ### Enable globally
 
-      iex> FunWithFlags.enabled?(:super_shrink_ray)
+      iex> ForkWithFlags.enabled?(:super_shrink_ray)
       false
-      iex> FunWithFlags.enable(:super_shrink_ray)
+      iex> ForkWithFlags.enable(:super_shrink_ray)
       {:ok, true}
-      iex> FunWithFlags.enabled?(:super_shrink_ray)
+      iex> ForkWithFlags.enabled?(:super_shrink_ray)
       true
 
   ### Enable for an actor
 
-      iex> FunWithFlags.disable(:warp_drive)
+      iex> ForkWithFlags.disable(:warp_drive)
       {:ok, false}
-      iex> FunWithFlags.enable(:warp_drive, for_actor: "Scotty")
+      iex> ForkWithFlags.enable(:warp_drive, for_actor: "Scotty")
       {:ok, true}
-      iex> FunWithFlags.enabled?(:warp_drive)
+      iex> ForkWithFlags.enabled?(:warp_drive)
       false
-      iex> FunWithFlags.enabled?(:warp_drive, for: "Scotty")
+      iex> ForkWithFlags.enabled?(:warp_drive, for: "Scotty")
       true
 
   ### Enable for a group
 
-  This example relies on the [reference implementation](https://github.com/tompave/fun_with_flags/blob/master/test/support/test_user.ex)
+  This example relies on the [reference implementation](https://github.com/tylerbarker/fork_with_flags/blob/master/test/support/test_user.ex)
   used in the tests.
 
-      iex> alias FunWithFlags.TestUser, as: User
+      iex> alias ForkWithFlags.TestUser, as: User
       iex> marty = %User{name: "Marty McFly", groups: ["students", "time_travelers"]}
       iex> doc = %User{name: "Emmet Brown", groups: ["scientists", "time_travelers"]}
       iex> buford = %User{name: "Buford Tannen", groups: ["gunmen", "bandits"]}
-      iex> FunWithFlags.enable(:delorean, for_group: "time_travelers")
+      iex> ForkWithFlags.enable(:delorean, for_group: "time_travelers")
       {:ok, true}
-      iex> FunWithFlags.enabled?(:delorean)
+      iex> ForkWithFlags.enabled?(:delorean)
       false
-      iex> FunWithFlags.enabled?(:delorean, for: buford)
+      iex> ForkWithFlags.enabled?(:delorean, for: buford)
       false
-      iex> FunWithFlags.enabled?(:delorean, for: marty)
+      iex> ForkWithFlags.enabled?(:delorean, for: marty)
       true
-      iex> FunWithFlags.enabled?(:delorean, for: doc)
+      iex> ForkWithFlags.enabled?(:delorean, for: doc)
       true
 
 
   ### Enable for a percentage of the time
 
-      iex> FunWithFlags.disable(:random_glitch)
-      iex> FunWithFlags.enable(:random_glitch, for_percentage_of: {:time, 0.999999999})
-      iex> FunWithFlags.enabled?(:random_glitch)
+      iex> ForkWithFlags.disable(:random_glitch)
+      iex> ForkWithFlags.enable(:random_glitch, for_percentage_of: {:time, 0.999999999})
+      iex> ForkWithFlags.enabled?(:random_glitch)
       true
-      iex> FunWithFlags.enable(:random_glitch, for_percentage_of: {:time, 0.000000001})
-      iex> FunWithFlags.enabled?(:random_glitch)
+      iex> ForkWithFlags.enable(:random_glitch, for_percentage_of: {:time, 0.000000001})
+      iex> ForkWithFlags.enabled?(:random_glitch)
       false
 
   ### Enable for a percentage of the actors
@@ -161,16 +161,16 @@ defmodule FunWithFlags do
   This example is based on the fact that the actor score for the actor-flag pair
   `marty + :new_ui` is lower than 50%, and for the `buford + :new_ui` is higher.
 
-      iex> FunWithFlags.disable(:new_ui)
-      iex> FunWithFlags.enable(:new_ui, for_percentage_of: {:actors, 0.5})
-      iex> FunWithFlags.enabled?(:new_ui)
+      iex> ForkWithFlags.disable(:new_ui)
+      iex> ForkWithFlags.enable(:new_ui, for_percentage_of: {:actors, 0.5})
+      iex> ForkWithFlags.enabled?(:new_ui)
       false
-      iex> alias FunWithFlags.TestUser, as: User
+      iex> alias ForkWithFlags.TestUser, as: User
       iex> marty = %User{id: 42, name: "Marty McFly"}
       iex> buford = %User{id: 2, name: "Buford Tannen"}
-      iex> FunWithFlags.enabled?(:new_ui, for: marty)
+      iex> ForkWithFlags.enabled?(:new_ui, for: marty)
       true
-      iex> FunWithFlags.enabled?(:new_ui, for: buford)
+      iex> ForkWithFlags.enabled?(:new_ui, for: buford)
       false
 
   """
@@ -247,62 +247,62 @@ defmodule FunWithFlags do
 
   ### Disable globally
 
-      iex> FunWithFlags.enable(:random_koala_gifs)
-      iex> FunWithFlags.enabled?(:random_koala_gifs)
+      iex> ForkWithFlags.enable(:random_koala_gifs)
+      iex> ForkWithFlags.enabled?(:random_koala_gifs)
       true
-      iex> FunWithFlags.disable(:random_koala_gifs)
+      iex> ForkWithFlags.disable(:random_koala_gifs)
       {:ok, false}
-      iex> FunWithFlags.enabled?(:random_koala_gifs)
+      iex> ForkWithFlags.enabled?(:random_koala_gifs)
       false
 
 
   ## Disable for an actor
 
-      iex> FunWithFlags.enable(:spider_sense)
+      iex> ForkWithFlags.enable(:spider_sense)
       {:ok, true}
       iex> villain = %{name: "Venom"}
-      iex> FunWithFlags.disable(:spider_sense, for_actor: villain)
+      iex> ForkWithFlags.disable(:spider_sense, for_actor: villain)
       {:ok, false}
-      iex> FunWithFlags.enabled?(:spider_sense)
+      iex> ForkWithFlags.enabled?(:spider_sense)
       true
-      iex> FunWithFlags.enabled?(:spider_sense, for: villain)
+      iex> ForkWithFlags.enabled?(:spider_sense, for: villain)
       false
 
   ### Disable for a group
 
-  This example relies on the [reference implementation](https://github.com/tompave/fun_with_flags/blob/master/test/support/test_user.ex)
+  This example relies on the [reference implementation](https://github.com/tylerbarker/fork_with_flags/blob/master/test/support/test_user.ex)
   used in the tests.
 
-      iex> alias FunWithFlags.TestUser, as: User
+      iex> alias ForkWithFlags.TestUser, as: User
       iex> harry = %User{name: "Harry Potter", groups: ["wizards", "gryffindor"]}
       iex> dudley = %User{name: "Dudley Dursley", groups: ["muggles"]}
-      iex> FunWithFlags.enable(:hogwarts)
+      iex> ForkWithFlags.enable(:hogwarts)
       {:ok, true}
-      iex> FunWithFlags.disable(:hogwarts, for_group: "muggles")
+      iex> ForkWithFlags.disable(:hogwarts, for_group: "muggles")
       {:ok, false}
-      iex> FunWithFlags.enabled?(:hogwarts)
+      iex> ForkWithFlags.enabled?(:hogwarts)
       true
-      iex> FunWithFlags.enabled?(:hogwarts, for: harry)
+      iex> ForkWithFlags.enabled?(:hogwarts, for: harry)
       true
-      iex> FunWithFlags.enabled?(:hogwarts, for: dudley)
+      iex> ForkWithFlags.enabled?(:hogwarts, for: dudley)
       false
 
   ### Disable for a percentage of the time
 
-      iex> FunWithFlags.clear(:random_glitch)
+      iex> ForkWithFlags.clear(:random_glitch)
       :ok
-      iex> FunWithFlags.disable(:random_glitch, for_percentage_of: {:time, 0.999999999})
+      iex> ForkWithFlags.disable(:random_glitch, for_percentage_of: {:time, 0.999999999})
       {:ok, false}
-      iex> FunWithFlags.enabled?(:random_glitch)
+      iex> ForkWithFlags.enabled?(:random_glitch)
       false
-      iex> FunWithFlags.disable(:random_glitch, for_percentage_of: {:time, 0.000000001})
+      iex> ForkWithFlags.disable(:random_glitch, for_percentage_of: {:time, 0.000000001})
       {:ok, false}
-      iex> FunWithFlags.enabled?(:random_glitch)
+      iex> ForkWithFlags.enabled?(:random_glitch)
       true
 
   ### Disable for a percentage of the actors
 
-      iex> FunWithFlags.disable(:new_ui, for_percentage_of: {:actors, 0.3})
+      iex> ForkWithFlags.disable(:new_ui, for_percentage_of: {:actors, 0.3})
       {:ok, false}
 
   """
@@ -380,37 +380,37 @@ defmodule FunWithFlags do
 
   ## Examples
 
-      iex> alias FunWithFlags.TestUser, as: User
+      iex> alias ForkWithFlags.TestUser, as: User
       iex> harry = %User{id: 1, name: "Harry Potter", groups: ["wizards", "gryffindor"]}
       iex> hagrid = %User{id: 2, name: "Rubeus Hagrid", groups: ["wizards", "gamekeeper"]}
       iex> dudley = %User{id: 3, name: "Dudley Dursley", groups: ["muggles"]}
-      iex> FunWithFlags.disable(:wands)
-      iex> FunWithFlags.enable(:wands, for_group: "wizards")
-      iex> FunWithFlags.disable(:wands, for_actor: hagrid)
+      iex> ForkWithFlags.disable(:wands)
+      iex> ForkWithFlags.enable(:wands, for_group: "wizards")
+      iex> ForkWithFlags.disable(:wands, for_actor: hagrid)
       iex>
-      iex> FunWithFlags.enabled?(:wands)
+      iex> ForkWithFlags.enabled?(:wands)
       false
-      iex> FunWithFlags.enabled?(:wands, for: harry)
+      iex> ForkWithFlags.enabled?(:wands, for: harry)
       true
-      iex> FunWithFlags.enabled?(:wands, for: hagrid)
+      iex> ForkWithFlags.enabled?(:wands, for: hagrid)
       false
-      iex> FunWithFlags.enabled?(:wands, for: dudley)
+      iex> ForkWithFlags.enabled?(:wands, for: dudley)
       false
       iex>
-      iex> FunWithFlags.clear(:wands, for_actor: hagrid)
+      iex> ForkWithFlags.clear(:wands, for_actor: hagrid)
       :ok
-      iex> FunWithFlags.enabled?(:wands, for: hagrid)
+      iex> ForkWithFlags.enabled?(:wands, for: hagrid)
       true
       iex>
-      iex> FunWithFlags.clear(:wands)
+      iex> ForkWithFlags.clear(:wands)
       :ok
-      iex> FunWithFlags.enabled?(:wands)
+      iex> ForkWithFlags.enabled?(:wands)
       false
-      iex> FunWithFlags.enabled?(:wands, for: harry)
+      iex> ForkWithFlags.enabled?(:wands, for: harry)
       false
-      iex> FunWithFlags.enabled?(:wands, for: hagrid)
+      iex> ForkWithFlags.enabled?(:wands, for: hagrid)
       false
-      iex> FunWithFlags.enabled?(:wands, for: dudley)
+      iex> ForkWithFlags.enabled?(:wands, for: dudley)
       false
 
   """
@@ -481,19 +481,19 @@ defmodule FunWithFlags do
 
   To query the value of a flag, please use the `enabled?2` function instead.
   """
-  @spec all_flags() :: {:ok, [FunWithFlags.Flag.t]} | {:error, any}
+  @spec all_flags() :: {:ok, [ForkWithFlags.Flag.t]} | {:error, any}
   def all_flags do
     Config.persistence_adapter().all_flags()
   end
 
 
   @doc """
-  Returns a `FunWithFlags.Flag` struct for the given name, or `nil` if
+  Returns a `ForkWithFlags.Flag` struct for the given name, or `nil` if
   no flag is found.
 
   Useful for debugging.
   """
-  @spec get_flag(atom) :: FunWithFlags.Flag.t | nil | {:error, any}
+  @spec get_flag(atom) :: ForkWithFlags.Flag.t | nil | {:error, any}
   def get_flag(name) do
     case all_flag_names() do
       {:ok, names} ->

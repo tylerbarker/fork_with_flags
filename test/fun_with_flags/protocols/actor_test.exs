@@ -1,7 +1,7 @@
-defmodule FunWithFlags.ActorTest do
-  use FunWithFlags.TestCase, async: true
+defmodule ForkWithFlags.ActorTest do
+  use ForkWithFlags.TestCase, async: true
 
-  alias FunWithFlags.{Actor, TestUser}
+  alias ForkWithFlags.{Actor, TestUser}
 
   setup do
     user = %TestUser{id: 1, email: "bruce@wayne.com"}
@@ -36,7 +36,7 @@ defmodule FunWithFlags.ActorTest do
   end
 
   describe "score(actor, flag_name), auto-delegated to a private worker module" do
-    import FunWithFlags.TestUtils
+    import ForkWithFlags.TestUtils
 
     test "it returns a float" do
       map = %{actor_id: 42}

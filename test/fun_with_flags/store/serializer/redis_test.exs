@@ -1,9 +1,9 @@
-defmodule FunWithFlags.Store.Serializer.RedisTest do
-  use FunWithFlags.TestCase, async: true
+defmodule ForkWithFlags.Store.Serializer.RedisTest do
+  use ForkWithFlags.TestCase, async: true
 
-  alias FunWithFlags.Flag
-  alias FunWithFlags.Gate
-  alias FunWithFlags.Store.Serializer.Redis, as: Serializer
+  alias ForkWithFlags.Flag
+  alias ForkWithFlags.Gate
+  alias ForkWithFlags.Store.Serializer.Redis, as: Serializer
 
   describe "serialize(gate) returns a List ready to be saved in Redis" do
     test "with a boolean gate" do

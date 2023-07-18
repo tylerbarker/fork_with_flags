@@ -1,9 +1,9 @@
-defmodule FunWithFlags.Store.Persistent.EctoTest do
-  use FunWithFlags.TestCase, async: false
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.Store.Persistent.EctoTest do
+  use ForkWithFlags.TestCase, async: false
+  import ForkWithFlags.TestUtils
 
-  alias FunWithFlags.Store.Persistent.Ecto, as: PersiEcto
-  alias FunWithFlags.{Flag, Gate}
+  alias ForkWithFlags.Store.Persistent.Ecto, as: PersiEcto
+  alias ForkWithFlags.{Flag, Gate}
 
   @moduletag :ecto_persistence
 
@@ -72,7 +72,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
       PersiEcto.put(name, other_actor_gate)
       expected_gates = [other_actor_gate, first_actor_gate, first_bool_gate]
       assert {:ok, %Flag{name: ^name, gates: got_gates}} = PersiEcto.get(name)
-      
+
       assert Enum.sort(expected_gates) == Enum.sort(got_gates)
 
       first_actor_gate_disabled = %Gate{first_actor_gate | enabled: false}
@@ -89,7 +89,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
       PersiEcto.put(name, other_group_gate)
       expected_gates = [other_actor_gate, first_actor_gate_disabled, first_bool_gate, other_group_gate, first_group_gate]
       assert {:ok, %Flag{name: ^name, gates: got_gates}} = PersiEcto.get(name)
-      
+
       assert Enum.sort(expected_gates) == Enum.sort(got_gates)
 
       first_group_gate_disabled = %Gate{first_group_gate | enabled: false}
@@ -133,7 +133,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
       assert {:ok, %Flag{name: ^name, gates: [^pot_gate]}} = PersiEcto.put(name, pot_gate)
     end
 
-    
+
     test "put()'ing more gates will return an increasily updated flag", %{name: name, pot_gate: pot_gate} do
       bool_gate = Gate.new(:boolean, false)
       assert {:ok, %Flag{name: ^name, gates: [^bool_gate]}} = PersiEcto.put(name, bool_gate)
@@ -175,7 +175,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
       assert {:ok, %Flag{name: ^name, gates: [^poa_gate]}} = PersiEcto.put(name, poa_gate)
     end
 
-    
+
     test "put()'ing more gates will return an increasily updated flag", %{name: name, poa_gate: poa_gate} do
       bool_gate = Gate.new(:boolean, false)
       assert {:ok, %Flag{name: ^name, gates: [^bool_gate]}} = PersiEcto.put(name, bool_gate)
@@ -280,7 +280,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
     test "delete(flag_name, gate) returns the tuple {:ok, %Flag{}}",
          %{name: name, bool_gate: bool_gate, group_gate: group_gate, actor_gate: actor_gate, pot_gate: pot_gate} do
 
-      assert {:ok, %Flag{name: ^name, gates: [^actor_gate, ^bool_gate, ^group_gate, ^pot_gate]}} = PersiEcto.get(name)          
+      assert {:ok, %Flag{name: ^name, gates: [^actor_gate, ^bool_gate, ^group_gate, ^pot_gate]}} = PersiEcto.get(name)
       assert {:ok, %Flag{name: ^name, gates: [^actor_gate, ^bool_gate, ^group_gate]}} = PersiEcto.delete(name, pot_gate)
     end
 
@@ -343,7 +343,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
     test "delete(flag_name, gate) returns the tuple {:ok, %Flag{}}",
          %{name: name, bool_gate: bool_gate, group_gate: group_gate, actor_gate: actor_gate, poa_gate: poa_gate} do
 
-      assert {:ok, %Flag{name: ^name, gates: [^actor_gate, ^bool_gate, ^group_gate, ^poa_gate]}} = PersiEcto.get(name)          
+      assert {:ok, %Flag{name: ^name, gates: [^actor_gate, ^bool_gate, ^group_gate, ^poa_gate]}} = PersiEcto.get(name)
       assert {:ok, %Flag{name: ^name, gates: [^actor_gate, ^bool_gate, ^group_gate]}} = PersiEcto.delete(name, poa_gate)
     end
 
@@ -426,7 +426,7 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
       assert {:ok, %Flag{name: ^name, gates: []}} = PersiEcto.get(name)
       PersiEcto.put(name, gate)
       assert {:ok, %Flag{name: ^name, gates: [^gate]}} = PersiEcto.get(name)
-    end  
+    end
   end
 
 
@@ -501,19 +501,19 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
       end
     end
   end
-  
+
 
 
   describe "integration: enable and disable with the top-level API" do
     test "looking up a disabled flag" do
       name = unique_atom()
-      FunWithFlags.disable(name)
+      ForkWithFlags.disable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: false}]}} = PersiEcto.get(name)
     end
 
     test "looking up an enabled flag" do
       name = unique_atom()
-      FunWithFlags.enable(name)
+      ForkWithFlags.enable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: true}]}} = PersiEcto.get(name)
     end
   end

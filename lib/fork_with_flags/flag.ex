@@ -1,14 +1,14 @@
-defmodule FunWithFlags.Flag do
+defmodule ForkWithFlags.Flag do
   @moduledoc """
   Represents a feature flag.
 
   This module is not meant to be used directly.
   """
 
-  alias FunWithFlags.Gate
+  alias ForkWithFlags.Gate
 
   defstruct [name: nil, gates: []]
-  @type t :: %FunWithFlags.Flag{name: atom, gates: [FunWithFlags.Gate.t]}
+  @type t :: %ForkWithFlags.Flag{name: atom, gates: [ForkWithFlags.Gate.t]}
   @typep options :: Keyword.t
 
 

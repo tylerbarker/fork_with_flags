@@ -1,9 +1,9 @@
-defmodule FunWithFlags.Notifications.RedisTest do
-  use FunWithFlags.TestCase, async: false
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.Notifications.RedisTest do
+  use ForkWithFlags.TestCase, async: false
+  import ForkWithFlags.TestUtils
   import Mock
 
-  alias FunWithFlags.Notifications.Redis, as: NotifiRedis
+  alias ForkWithFlags.Notifications.Redis, as: NotifiRedis
 
   @moduletag :redis_pubsub
 
@@ -22,9 +22,9 @@ defmodule FunWithFlags.Notifications.RedisTest do
       configure_redis_with(url)
 
       expected = %{
-        id: FunWithFlags.Notifications.Redis,
+        id: ForkWithFlags.Notifications.Redis,
         start: {
-          FunWithFlags.Notifications.Redis,
+          ForkWithFlags.Notifications.Redis,
           :start_link,
           [
             {url, name: :fun_with_flags_notifications, sync_connect: false}
@@ -43,9 +43,9 @@ defmodule FunWithFlags.Notifications.RedisTest do
       configure_redis_with({url, opts})
 
       expected = %{
-        id: FunWithFlags.Notifications.Redis,
+        id: ForkWithFlags.Notifications.Redis,
         start: {
-          FunWithFlags.Notifications.Redis,
+          ForkWithFlags.Notifications.Redis,
           :start_link,
           [
             {
@@ -70,9 +70,9 @@ defmodule FunWithFlags.Notifications.RedisTest do
       configure_redis_with(kw)
 
       expected = %{
-        id: FunWithFlags.Notifications.Redis,
+        id: ForkWithFlags.Notifications.Redis,
         start: {
-          FunWithFlags.Notifications.Redis,
+          ForkWithFlags.Notifications.Redis,
           :start_link,
           [
             [
@@ -153,7 +153,7 @@ defmodule FunWithFlags.Notifications.RedisTest do
 
         assert called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "#{u_id}:#{name}"]
           )
         )
@@ -164,7 +164,7 @@ defmodule FunWithFlags.Notifications.RedisTest do
       channel = "fun_with_flags_changes"
       u_id = NotifiRedis.unique_id()
 
-      {:ok, receiver} = Redix.PubSub.start_link(Keyword.merge(FunWithFlags.Config.redis_config, [sync_connect: true]))
+      {:ok, receiver} = Redix.PubSub.start_link(Keyword.merge(ForkWithFlags.Config.redis_config, [sync_connect: true]))
       {:ok, ref} = Redix.PubSub.subscribe(receiver, channel, self())
 
       receive do
@@ -199,14 +199,14 @@ defmodule FunWithFlags.Notifications.RedisTest do
 
 
   test "it receives messages if something is published on Redis" do
-    alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
+    alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
 
     u_id = NotifiRedis.unique_id()
     channel = "fun_with_flags_changes"
     pubsub_receiver_pid = GenServer.whereis(:fun_with_flags_notifications)
     message = "foobar"
 
-    {^u_id, ref} = :sys.get_state(FunWithFlags.Notifications.Redis)
+    {^u_id, ref} = :sys.get_state(ForkWithFlags.Notifications.Redis)
 
     with_mock(NotifiRedis, [:passthrough], []) do
       Redix.command(PersiRedis, ["PUBLISH", channel, message])
@@ -229,8 +229,8 @@ defmodule FunWithFlags.Notifications.RedisTest do
 
 
   describe "integration: message handling" do
-    alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
-    alias FunWithFlags.{Store, Config}
+    alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
+    alias ForkWithFlags.{Store, Config}
 
 
     test "when the message is not valid, it is ignored" do
@@ -274,9 +274,9 @@ defmodule FunWithFlags.Notifications.RedisTest do
 
 
   describe "integration: side effects" do
-    alias FunWithFlags.Store.Cache
-    alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
-    alias FunWithFlags.{Store, Config, Gate, Flag}
+    alias ForkWithFlags.Store.Cache
+    alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
+    alias ForkWithFlags.{Store, Config, Gate, Flag}
 
     setup do
       name = unique_atom()

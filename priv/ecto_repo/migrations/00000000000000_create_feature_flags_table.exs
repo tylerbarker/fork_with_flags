@@ -1,4 +1,4 @@
-defmodule FunWithFlags.Dev.EctoRepo.Migrations.CreateFeatureFlagsTable do
+defmodule ForkWithFlags.Dev.EctoRepo.Migrations.CreateFeatureFlagsTable do
   use Ecto.Migration
 
   # This migration assumes the default table name of "fun_with_flags_toggles"

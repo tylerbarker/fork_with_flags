@@ -1,11 +1,11 @@
 if Code.ensure_loaded?(Ecto.Adapters.SQL) do
 
-defmodule FunWithFlags.Store.Serializer.Ecto do
+defmodule ForkWithFlags.Store.Serializer.Ecto do
   @moduledoc false
 
-  alias FunWithFlags.Flag
-  alias FunWithFlags.Gate
-  alias FunWithFlags.Store.Persistent.Ecto.Record
+  alias ForkWithFlags.Flag
+  alias ForkWithFlags.Gate
+  alias ForkWithFlags.Store.Persistent.Ecto.Record
 
   def deserialize_flag(name, []), do: Flag.new(to_atom(name), [])
 

@@ -1,10 +1,10 @@
 if Code.ensure_loaded?(Ecto.Adapters.SQL) do
 
-defmodule FunWithFlags.Store.Persistent.Ecto.Record do
+defmodule ForkWithFlags.Store.Persistent.Ecto.Record do
   @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
-  alias FunWithFlags.{Config, Gate}
+  alias ForkWithFlags.{Config, Gate}
 
   @primary_key {:id, :id, autogenerate: true}
 

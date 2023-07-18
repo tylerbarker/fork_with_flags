@@ -1,6 +1,6 @@
-defmodule FunWithFlags.TimestampsTest do
-  use FunWithFlags.TestCase
-  alias FunWithFlags.Timestamps, as: TS
+defmodule ForkWithFlags.TimestampsTest do
+  use ForkWithFlags.TestCase
+  alias ForkWithFlags.Timestamps, as: TS
 
   test "now() returns a Unix timestamp" do
     assert is_integer(TS.now)
@@ -25,7 +25,7 @@ defmodule FunWithFlags.TimestampsTest do
   end
 
 
-  describe "expired?() tells if a timestamp is past its ttl" do    
+  describe "expired?() tells if a timestamp is past its ttl" do
     test "it returns true when the timestamp is expired" do
       one_min_ago = TS.now - 60
       assert TS.expired?(one_min_ago, 10)

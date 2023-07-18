@@ -1,9 +1,9 @@
-defmodule FunWithFlags.SimpleStore do
+defmodule ForkWithFlags.SimpleStore do
   @moduledoc false
 
-  import FunWithFlags.Config, only: [persistence_adapter: 0]
+  import ForkWithFlags.Config, only: [persistence_adapter: 0]
 
-  @spec lookup(atom) :: {:ok, FunWithFlags.Flag.t}
+  @spec lookup(atom) :: {:ok, ForkWithFlags.Flag.t}
   def lookup(flag_name) do
     case persistence_adapter().get(flag_name) do
       {:ok, flag} -> {:ok, flag}
@@ -11,22 +11,22 @@ defmodule FunWithFlags.SimpleStore do
     end
   end
 
-  @spec put(atom, FunWithFlags.Gate.t) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec put(atom, ForkWithFlags.Gate.t) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def put(flag_name, gate) do
     persistence_adapter().put(flag_name, gate)
   end
 
-  @spec delete(atom, FunWithFlags.Gate.t) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec delete(atom, ForkWithFlags.Gate.t) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def delete(flag_name, gate) do
     persistence_adapter().delete(flag_name, gate)
   end
 
-  @spec delete(atom) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec delete(atom) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def delete(flag_name) do
     persistence_adapter().delete(flag_name)
   end
 
-  @spec all_flags() :: {:ok, [FunWithFlags.Flag.t]} | {:error, any()}
+  @spec all_flags() :: {:ok, [ForkWithFlags.Flag.t]} | {:error, any()}
   def all_flags do
     persistence_adapter().all_flags()
   end

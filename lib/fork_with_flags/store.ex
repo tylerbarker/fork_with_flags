@@ -1,13 +1,13 @@
-defmodule FunWithFlags.Store do
+defmodule ForkWithFlags.Store do
   @moduledoc false
 
   require Logger
-  alias FunWithFlags.Store.Cache
-  alias FunWithFlags.{Config, Flag}
+  alias ForkWithFlags.Store.Cache
+  alias ForkWithFlags.{Config, Flag}
 
-  import FunWithFlags.Config, only: [persistence_adapter: 0]
+  import ForkWithFlags.Config, only: [persistence_adapter: 0]
 
-  @spec lookup(atom) :: {:ok, FunWithFlags.Flag.t}
+  @spec lookup(atom) :: {:ok, ForkWithFlags.Flag.t}
   def lookup(flag_name) do
     case Cache.get(flag_name) do
       {:ok, flag} ->
@@ -25,7 +25,7 @@ defmodule FunWithFlags.Store do
 
 
   defp try_to_use_the_cached_value(:expired, value, flag_name) do
-    Logger.warn "FunWithFlags: couldn't load flag '#{flag_name}' from storage, falling back to stale cached value from ETS"
+    Logger.warn "ForkWithFlags: couldn't load flag '#{flag_name}' from storage, falling back to stale cached value from ETS"
     {:ok, value}
   end
   defp try_to_use_the_cached_value(_, _, flag_name) do
@@ -33,7 +33,7 @@ defmodule FunWithFlags.Store do
   end
 
 
-  @spec put(atom, FunWithFlags.Gate.t) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec put(atom, ForkWithFlags.Gate.t) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def put(flag_name, gate) do
     flag_name
     |> persistence_adapter().put(gate)
@@ -42,7 +42,7 @@ defmodule FunWithFlags.Store do
   end
 
 
-  @spec delete(atom, FunWithFlags.Gate.t) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec delete(atom, ForkWithFlags.Gate.t) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def delete(flag_name, gate) do
     flag_name
     |> persistence_adapter().delete(gate)
@@ -51,7 +51,7 @@ defmodule FunWithFlags.Store do
   end
 
 
-  @spec delete(atom) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec delete(atom) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def delete(flag_name) do
     flag_name
     |> persistence_adapter().delete()
@@ -60,16 +60,16 @@ defmodule FunWithFlags.Store do
   end
 
 
-  @spec reload(atom) :: {:ok, FunWithFlags.Flag.t} | {:error, any()}
+  @spec reload(atom) :: {:ok, ForkWithFlags.Flag.t} | {:error, any()}
   def reload(flag_name) do
-    Logger.debug fn -> "FunWithFlags: reloading cached flag '#{flag_name}' from storage " end
+    Logger.debug fn -> "ForkWithFlags: reloading cached flag '#{flag_name}' from storage " end
     flag_name
     |> persistence_adapter().get()
     |> cache_persistence_result()
   end
 
 
-  @spec all_flags() :: {:ok, [FunWithFlags.Flag.t]} | {:error, any()}
+  @spec all_flags() :: {:ok, [ForkWithFlags.Flag.t]} | {:error, any()}
   def all_flags do
     persistence_adapter().all_flags()
   end

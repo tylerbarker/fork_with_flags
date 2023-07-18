@@ -1,11 +1,11 @@
 # If we are not using Ecto and we're not using Phoenix.PubSub, then
 # we need a Redis instance for either persistence or PubSub.
 does_anything_need_redis = !(
-  FunWithFlags.Config.persist_in_ecto? && FunWithFlags.Config.phoenix_pubsub?
+  ForkWithFlags.Config.persist_in_ecto? && ForkWithFlags.Config.phoenix_pubsub?
 )
 
 
-if FunWithFlags.Config.phoenix_pubsub? do
+if ForkWithFlags.Config.phoenix_pubsub? do
   # The Phoenix PubSub application must be running before we try to start our
   # PubSub process and subscribe.
   :ok = Application.ensure_started(:phoenix_pubsub)
@@ -30,20 +30,20 @@ IO.puts "--------------------------------------------------------------"
 IO.puts "Elixir version:        #{System.version()}"
 IO.puts "Erlang/OTP version:    #{:erlang.system_info(:system_version) |> to_string() |> String.trim_trailing()}"
 IO.puts "Logger level:          #{inspect(Logger.level())}"
-IO.puts "Cache enabled:         #{inspect(FunWithFlags.Config.cache?)}"
-IO.puts "Persistence adapter:   #{inspect(FunWithFlags.Config.persistence_adapter())}"
-IO.puts "RDBMS driver:          #{inspect(if FunWithFlags.Config.persist_in_ecto?, do: FunWithFlags.Dev.EctoRepo.__adapter__(), else: nil)}"
-IO.puts "Notifications adapter: #{inspect(FunWithFlags.Config.notifications_adapter())}"
+IO.puts "Cache enabled:         #{inspect(ForkWithFlags.Config.cache?)}"
+IO.puts "Persistence adapter:   #{inspect(ForkWithFlags.Config.persistence_adapter())}"
+IO.puts "RDBMS driver:          #{inspect(if ForkWithFlags.Config.persist_in_ecto?, do: ForkWithFlags.Dev.EctoRepo.__adapter__(), else: nil)}"
+IO.puts "Notifications adapter: #{inspect(ForkWithFlags.Config.notifications_adapter())}"
 IO.puts "Anything using Redis:  #{inspect(does_anything_need_redis)}"
 IO.puts "--------------------------------------------------------------"
 
 if does_anything_need_redis do
-  FunWithFlags.TestUtils.use_redis_test_db()
+  ForkWithFlags.TestUtils.use_redis_test_db()
 end
 
 ExUnit.start()
 
-if FunWithFlags.Config.persist_in_ecto? do
-  {:ok, _pid} = FunWithFlags.Dev.EctoRepo.start_link()
-  Ecto.Adapters.SQL.Sandbox.mode(FunWithFlags.Dev.EctoRepo, :manual)
+if ForkWithFlags.Config.persist_in_ecto? do
+  {:ok, _pid} = ForkWithFlags.Dev.EctoRepo.start_link()
+  Ecto.Adapters.SQL.Sandbox.mode(ForkWithFlags.Dev.EctoRepo, :manual)
 end

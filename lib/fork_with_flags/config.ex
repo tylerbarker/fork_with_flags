@@ -1,4 +1,4 @@
-defmodule FunWithFlags.Config do
+defmodule ForkWithFlags.Config do
   require Application
 
   @moduledoc false
@@ -15,17 +15,17 @@ defmodule FunWithFlags.Config do
 
   @default_notifications_config [
     enabled: true,
-    adapter: FunWithFlags.Notifications.Redis
+    adapter: ForkWithFlags.Notifications.Redis
   ]
 
   @default_persistence_config [
-    adapter: FunWithFlags.Store.Persistent.Redis,
-    repo: FunWithFlags.NullEctoRepo,
+    adapter: ForkWithFlags.Store.Persistent.Redis,
+    repo: ForkWithFlags.NullEctoRepo,
     ecto_table_name: "fun_with_flags_toggles"
   ]
 
   def redis_config do
-    case Application.get_env(:fun_with_flags, :redis, []) do
+    case Application.get_env(:fork_with_flags, :redis, []) do
       uri  when is_binary(uri) ->
         uri
       {uri, opts} when is_binary(uri) and is_list(opts) ->
@@ -57,14 +57,14 @@ defmodule FunWithFlags.Config do
   def ets_cache_config do
     Keyword.merge(
       @default_cache_config,
-      Application.get_env(:fun_with_flags, :cache, [])
+      Application.get_env(:fork_with_flags, :cache, [])
     )
   end
 
   # Used to determine the store module at compile time, which is stored in a
   # module attribute. `Application.compile_env` cannot be used in functions,
   # so here we are.
-  @compile_time_cache_config Application.compile_env(:fun_with_flags, :cache, [])
+  @compile_time_cache_config Application.compile_env(:fork_with_flags, :cache, [])
 
   # If we're not using the cache, then don't bother with
   # the 2-level logic in the default Store module.
@@ -76,15 +76,15 @@ defmodule FunWithFlags.Config do
     )
 
     if Keyword.get(cache_conf, :enabled) do
-      FunWithFlags.Store
+      ForkWithFlags.Store
     else
-      FunWithFlags.SimpleStore
+      ForkWithFlags.SimpleStore
     end
   end
 
 
   # Used to determine the Ecto table name at compile time.
-  @compile_time_persistence_config Application.compile_env(:fun_with_flags, :persistence, [])
+  @compile_time_persistence_config Application.compile_env(:fork_with_flags, :persistence, [])
 
 
   def ecto_table_name_determined_at_compile_time do
@@ -99,11 +99,11 @@ defmodule FunWithFlags.Config do
   defp persistence_config do
     Keyword.merge(
       @default_persistence_config,
-      Application.get_env(:fun_with_flags, :persistence, [])
+      Application.get_env(:fork_with_flags, :persistence, [])
     )
   end
 
-  # Defaults to FunWithFlags.Store.Persistent.Redis
+  # Defaults to ForkWithFlags.Store.Persistent.Redis
   #
   def persistence_adapter do
     Keyword.get(persistence_config(), :adapter)
@@ -116,19 +116,19 @@ defmodule FunWithFlags.Config do
 
 
   def persist_in_ecto? do
-    persistence_adapter() == FunWithFlags.Store.Persistent.Ecto
+    persistence_adapter() == ForkWithFlags.Store.Persistent.Ecto
   end
 
 
   defp notifications_config do
     Keyword.merge(
       @default_notifications_config,
-      Application.get_env(:fun_with_flags, :cache_bust_notifications, [])
+      Application.get_env(:fork_with_flags, :cache_bust_notifications, [])
     )
   end
 
 
-  # Defaults to FunWithFlags.Notifications.Redis
+  # Defaults to ForkWithFlags.Notifications.Redis
   #
   def notifications_adapter do
     Keyword.get(notifications_config(), :adapter)
@@ -136,7 +136,7 @@ defmodule FunWithFlags.Config do
 
 
   def phoenix_pubsub? do
-    notifications_adapter() == FunWithFlags.Notifications.PhoenixPubSub
+    notifications_adapter() == ForkWithFlags.Notifications.PhoenixPubSub
   end
 
 

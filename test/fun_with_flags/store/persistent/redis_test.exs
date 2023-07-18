@@ -1,9 +1,9 @@
-defmodule FunWithFlags.Store.Persistent.RedisTest do
-  use FunWithFlags.TestCase, async: false
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.Store.Persistent.RedisTest do
+  use ForkWithFlags.TestCase, async: false
+  import ForkWithFlags.TestUtils
 
-  alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
-  alias FunWithFlags.{Flag, Gate}
+  alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
+  alias ForkWithFlags.{Flag, Gate}
 
   @moduletag :redis_persistence
 
@@ -30,7 +30,7 @@ defmodule FunWithFlags.Store.Persistent.RedisTest do
         id: Redix,
         start: {Redix, :start_link, [
           url,
-          [name: FunWithFlags.Store.Persistent.Redis, sync_connect: false]
+          [name: ForkWithFlags.Store.Persistent.Redis, sync_connect: false]
         ]},
         type: :worker
       }
@@ -49,7 +49,7 @@ defmodule FunWithFlags.Store.Persistent.RedisTest do
           url,
           [
             socket_opts: [:inet6],
-            name: FunWithFlags.Store.Persistent.Redis,
+            name: ForkWithFlags.Store.Persistent.Redis,
             sync_connect: false,
           ]
         ]},
@@ -70,7 +70,7 @@ defmodule FunWithFlags.Store.Persistent.RedisTest do
             host: "localhost",
             database: 100,
             port: 2000,
-            name: FunWithFlags.Store.Persistent.Redis,
+            name: ForkWithFlags.Store.Persistent.Redis,
             sync_connect: false
           ]
         ]},
@@ -370,13 +370,13 @@ defmodule FunWithFlags.Store.Persistent.RedisTest do
   describe "integration: enable and disable with the top-level API" do
     test "looking up a disabled flag" do
       name = unique_atom()
-      FunWithFlags.disable(name)
+      ForkWithFlags.disable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: false}]}} = PersiRedis.get(name)
     end
 
     test "looking up an enabled flag" do
       name = unique_atom()
-      FunWithFlags.enable(name)
+      ForkWithFlags.enable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: true}]}} = PersiRedis.get(name)
     end
   end

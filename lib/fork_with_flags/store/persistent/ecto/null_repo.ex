@@ -1,4 +1,4 @@
-defmodule FunWithFlags.NullEctoRepo do
+defmodule ForkWithFlags.NullEctoRepo do
   @moduledoc false
 
   # This is here just to raise some more helpful errors if a user

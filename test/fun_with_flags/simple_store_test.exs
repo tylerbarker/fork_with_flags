@@ -1,10 +1,10 @@
-defmodule FunWithFlags.SimpleStoreTest do
-  use FunWithFlags.TestCase, async: false
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.SimpleStoreTest do
+  use ForkWithFlags.TestCase, async: false
+  import ForkWithFlags.TestUtils
   import Mock
 
-  alias FunWithFlags.SimpleStore
-  alias FunWithFlags.{Flag, Gate}
+  alias ForkWithFlags.SimpleStore
+  alias ForkWithFlags.{Flag, Gate}
 
   setup_all do
     on_exit(__MODULE__, fn() -> clear_test_db() end)
@@ -204,13 +204,13 @@ defmodule FunWithFlags.SimpleStoreTest do
   describe "integration: enable and disable with the top-level API" do
     test "looking up a disabled flag" do
       name = unique_atom()
-      FunWithFlags.disable(name)
+      ForkWithFlags.disable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: false}]}} = SimpleStore.lookup(name)
     end
 
     test "looking up an enabled flag" do
       name = unique_atom()
-      FunWithFlags.enable(name)
+      ForkWithFlags.enable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: true}]}} = SimpleStore.lookup(name)
     end
   end
@@ -219,7 +219,7 @@ defmodule FunWithFlags.SimpleStoreTest do
   describe "in case of Persistent store failure" do
     @tag :redis_persistence
     test "it raises an error (redis)" do
-      alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
+      alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
       name = unique_atom()
 
       with_mock(PersiRedis, [], get: fn(^name) -> {:error, "mocked error"} end) do
@@ -233,7 +233,7 @@ defmodule FunWithFlags.SimpleStoreTest do
 
     @tag :redis_persistence
     test "in case of redis connection error" do
-      alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
+      alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
       name = unique_atom()
 
       with_mock(Redix, [], command: fn(_conn, ["HGETALL", _]) -> {:error, %Redix.ConnectionError{reason: :nxdomain}} end) do
@@ -247,7 +247,7 @@ defmodule FunWithFlags.SimpleStoreTest do
 
     @tag :redis_persistence
     test "in case of redis semantic error" do
-      alias FunWithFlags.Store.Persistent.Redis, as: PersiRedis
+      alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
       name = unique_atom()
 
       with_mock(Redix, [], command: fn(_conn, ["HGETALL", _]) -> {:error, %Redix.Error{message: "wrong type"}} end) do
@@ -261,7 +261,7 @@ defmodule FunWithFlags.SimpleStoreTest do
 
     @tag :ecto_persistence
     test "it raises an error (ecto)" do
-      alias FunWithFlags.Store.Persistent.Ecto, as: PersiEcto
+      alias ForkWithFlags.Store.Persistent.Ecto, as: PersiEcto
       name = unique_atom()
 
       with_mock(PersiEcto, [], get: fn(^name) -> {:error, "mocked error"} end) do

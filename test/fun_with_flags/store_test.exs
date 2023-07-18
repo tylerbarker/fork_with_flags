@@ -1,13 +1,13 @@
-defmodule FunWithFlags.StoreTest do
-  use FunWithFlags.TestCase, async: false
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.StoreTest do
+  use ForkWithFlags.TestCase, async: false
+  import ForkWithFlags.TestUtils
   import Mock
 
-  alias FunWithFlags.{Store, Config, Flag, Gate}
-  alias FunWithFlags.Store.Cache
+  alias ForkWithFlags.{Store, Config, Flag, Gate}
+  alias ForkWithFlags.Store.Cache
 
-  alias FunWithFlags.Notifications.Redis, as: NotifiRedis
-  alias FunWithFlags.Notifications.PhoenixPubSub, as: NotifiPhoenix
+  alias ForkWithFlags.Notifications.Redis, as: NotifiRedis
+  alias ForkWithFlags.Notifications.PhoenixPubSub, as: NotifiPhoenix
 
   @persistence Config.persistence_adapter()
 
@@ -70,7 +70,7 @@ defmodule FunWithFlags.StoreTest do
 
         assert called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "#{u_id}:#{name}"]
           )
         )
@@ -119,7 +119,7 @@ defmodule FunWithFlags.StoreTest do
       assert {:ok, ^flag} = Store.put(name, gate)
 
       payload = "#{u_id}:#{to_string(name)}"
-      
+
       receive do
         {:redix_pubsub, ^receiver, ^ref, :message, %{channel: ^channel, payload: ^payload}} -> :ok
       after
@@ -153,7 +153,7 @@ defmodule FunWithFlags.StoreTest do
       assert {:ok, ^flag} = Store.put(name, gate)
 
       payload = {:updated, name, u_id}
-      
+
       receive do
         {:fwf_changes, ^payload} -> :ok
       after
@@ -178,7 +178,7 @@ defmodule FunWithFlags.StoreTest do
 
         refute called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "unique_id_foobar:#{name}"]
           )
         )
@@ -256,7 +256,7 @@ defmodule FunWithFlags.StoreTest do
 
         assert called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "#{u_id}:#{name}"]
           )
         )
@@ -306,7 +306,7 @@ defmodule FunWithFlags.StoreTest do
       assert {:ok, %Flag{name: ^name}} = Store.delete(name, group_gate)
 
       payload = "#{u_id}:#{to_string(name)}"
-      
+
       receive do
         {:redix_pubsub, ^receiver, ^ref, :message, %{channel: ^channel, payload: ^payload}} -> :ok
       after
@@ -340,7 +340,7 @@ defmodule FunWithFlags.StoreTest do
       assert {:ok, %Flag{name: ^name}} = Store.delete(name, group_gate)
 
       payload = {:updated, name, u_id}
-      
+
       receive do
         {:fwf_changes, ^payload} -> :ok
       after
@@ -366,7 +366,7 @@ defmodule FunWithFlags.StoreTest do
 
         refute called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "unique_id_foobar:#{name}"]
           )
         )
@@ -440,7 +440,7 @@ defmodule FunWithFlags.StoreTest do
 
         assert called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "#{u_id}:#{name}"]
           )
         )
@@ -489,7 +489,7 @@ defmodule FunWithFlags.StoreTest do
       assert {:ok, %Flag{name: ^name, gates: []}} = Store.delete(name)
 
       payload = "#{u_id}:#{to_string(name)}"
-      
+
       receive do
         {:redix_pubsub, ^receiver, ^ref, :message, %{channel: ^channel, payload: ^payload}} -> :ok
       after
@@ -522,7 +522,7 @@ defmodule FunWithFlags.StoreTest do
       assert {:ok, %Flag{name: ^name, gates: []}} = Store.delete(name)
 
       payload = {:updated, name, u_id}
-      
+
       receive do
         {:fwf_changes, ^payload} -> :ok
       after
@@ -548,7 +548,7 @@ defmodule FunWithFlags.StoreTest do
 
         refute called(
           Redix.command(
-            FunWithFlags.Store.Persistent.Redis,
+            ForkWithFlags.Store.Persistent.Redis,
             ["PUBLISH", "fun_with_flags_changes", "unique_id_foobar:#{name}"]
           )
         )
@@ -699,13 +699,13 @@ defmodule FunWithFlags.StoreTest do
   describe "integration: enable and disable with the top-level API" do
     test "looking up a disabled flag" do
       name = unique_atom()
-      FunWithFlags.disable(name)
+      ForkWithFlags.disable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: false}]}} = Store.lookup(name)
     end
 
     test "looking up an enabled flag" do
       name = unique_atom()
-      FunWithFlags.enable(name)
+      ForkWithFlags.enable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: true}]}} = Store.lookup(name)
     end
   end
@@ -789,7 +789,7 @@ defmodule FunWithFlags.StoreTest do
 
       assert {:miss, :not_found, nil} = Cache.get(name)
       assert {:ok, ^flag} = @persistence.get(name)
-      
+
       assert {:ok, ^flag} = Store.lookup(name)
       assert {:ok, ^flag} = Cache.get(name)
     end

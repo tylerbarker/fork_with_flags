@@ -1,10 +1,10 @@
-defmodule FunWithFlags.Store.CacheTest do
-  use FunWithFlags.TestCase, async: false # mocks!
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.Store.CacheTest do
+  use ForkWithFlags.TestCase, async: false # mocks!
+  import ForkWithFlags.TestUtils
   import Mock
 
-  alias FunWithFlags.Store.Cache
-  alias FunWithFlags.{Timestamps, Config, Flag, Gate}
+  alias ForkWithFlags.Store.Cache
+  alias ForkWithFlags.{Timestamps, Config, Flag, Gate}
 
   setup do
     Cache.flush()
@@ -79,13 +79,13 @@ defmodule FunWithFlags.Store.CacheTest do
 
     test "looking up a disabled flag" do
       name = unique_atom()
-      FunWithFlags.disable(name)
+      ForkWithFlags.disable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: false}]}} = Cache.get(name)
     end
 
     test "looking up an enabled flag" do
       name = unique_atom()
-      FunWithFlags.enable(name)
+      ForkWithFlags.enable(name)
       assert {:ok, %Flag{name: ^name, gates: [%Gate{type: :boolean, enabled: true}]}} = Cache.get(name)
     end
   end

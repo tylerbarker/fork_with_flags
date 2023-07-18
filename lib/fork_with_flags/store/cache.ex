@@ -1,4 +1,4 @@
-defmodule FunWithFlags.Store.Cache do
+defmodule ForkWithFlags.Store.Cache do
   @moduledoc """
   The in-memory cache for the feature flag, backed by an ETS table.
 
@@ -12,9 +12,9 @@ defmodule FunWithFlags.Store.Cache do
   @doc false
   use GenServer
 
-  alias FunWithFlags.Config
-  alias FunWithFlags.Flag
-  alias FunWithFlags.Timestamps
+  alias ForkWithFlags.Config
+  alias ForkWithFlags.Flag
+  alias ForkWithFlags.Timestamps
 
   @table_name :fun_with_flags_cache
   @table_options [
@@ -24,7 +24,7 @@ defmodule FunWithFlags.Store.Cache do
 
   @doc false
   def worker_spec do
-    if FunWithFlags.Config.cache? do
+    if ForkWithFlags.Config.cache? do
       %{
         id: __MODULE__,
         start: {__MODULE__, :start_link, []},
@@ -89,7 +89,7 @@ defmodule FunWithFlags.Store.Cache do
   @doc """
   Returns the contents of the cache ETS table, for inspection.
   """
-  @spec dump() :: [{atom, {FunWithFlags.Flag.t, cached_at, ttl}}]
+  @spec dump() :: [{atom, {ForkWithFlags.Flag.t, cached_at, ttl}}]
   def dump do
     :ets.tab2list(@table_name)
   end

@@ -1,4 +1,4 @@
-defmodule FunWithFlags.Timestamps do
+defmodule ForkWithFlags.Timestamps do
   @moduledoc false
 
   def now do

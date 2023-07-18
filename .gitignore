@@ -29,6 +29,9 @@ dump.rdb
 fun_with_flags_test
 fun_with_flags_test-shm
 fun_with_flags_test-wal
+fork_with_flags_test
+fork_with_flags_test-shm
+fork_with_flags_test-wal
 
 # ASDF
 .tool-versions

@@ -1,9 +1,9 @@
-defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
-  use FunWithFlags.TestCase, async: false
-  import FunWithFlags.TestUtils
+defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
+  use ForkWithFlags.TestCase, async: false
+  import ForkWithFlags.TestUtils
   import Mock
 
-  alias FunWithFlags.Notifications.PhoenixPubSub, as: PubSub
+  alias ForkWithFlags.Notifications.PhoenixPubSub, as: PubSub
 
   @moduletag :phoenix_pubsub
 
@@ -63,7 +63,7 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
       assert {:ok, _pid} = PubSub.publish_change(name)
 
       payload = {:updated, name, u_id}
-      
+
       receive do
         {:fwf_changes, ^payload} -> :ok
       after
@@ -79,7 +79,7 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
 
   test "it receives messages if something is published on Phoenix.PubSub" do
     u_id = PubSub.unique_id()
-    client = FunWithFlags.Config.pubsub_client()
+    client = ForkWithFlags.Config.pubsub_client()
     channel = "fun_with_flags_changes"
     message = {:fwf_changes, {:updated, :foobar, u_id}}
 
@@ -96,15 +96,15 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
 
 
   describe "integration: message handling" do
-    alias FunWithFlags.{Store, Config}
+    alias ForkWithFlags.{Store, Config}
 
 
     test "when the message comes from this same process, it is ignored" do
       u_id = PubSub.unique_id()
-      client = FunWithFlags.Config.pubsub_client()
+      client = ForkWithFlags.Config.pubsub_client()
       channel = "fun_with_flags_changes"
       message = {:fwf_changes, {:updated, :a_flag_name, u_id}}
-      
+
       with_mock(Store, [:passthrough], []) do
         Phoenix.PubSub.broadcast!(client, channel, message)
         :timer.sleep(30)
@@ -117,10 +117,10 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
       another_u_id = Config.build_unique_id()
       refute another_u_id == PubSub.unique_id()
 
-      client = FunWithFlags.Config.pubsub_client()
+      client = ForkWithFlags.Config.pubsub_client()
       channel = "fun_with_flags_changes"
       message = {:fwf_changes, {:updated, :a_flag_name, another_u_id}}
-      
+
       with_mock(Store, [:passthrough], []) do
         Phoenix.PubSub.broadcast!(client, channel, message)
         :timer.sleep(30)
@@ -131,8 +131,8 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
 
 
   describe "integration: side effects" do
-    alias FunWithFlags.Store.Cache
-    alias FunWithFlags.{Store, Config, Gate, Flag}
+    alias ForkWithFlags.Store.Cache
+    alias ForkWithFlags.{Store, Config, Gate, Flag}
 
     setup do
       name = unique_atom()
@@ -157,10 +157,10 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
 
     test "when the message comes from this same process, the Cached value is not changed", %{name: name, cached_flag: cached_flag} do
       u_id = PubSub.unique_id()
-      client = FunWithFlags.Config.pubsub_client()
+      client = ForkWithFlags.Config.pubsub_client()
       channel = "fun_with_flags_changes"
       message = {:fwf_changes, {:updated, name, u_id}}
-      
+
       Phoenix.PubSub.broadcast!(client, channel, message)
       :timer.sleep(30)
       assert {:ok, ^cached_flag} = Cache.get(name)
@@ -171,10 +171,10 @@ defmodule FunWithFlags.Notifications.PhoenixPubSubTest do
       another_u_id = Config.build_unique_id()
       refute another_u_id == PubSub.unique_id()
 
-      client = FunWithFlags.Config.pubsub_client()
+      client = ForkWithFlags.Config.pubsub_client()
       channel = "fun_with_flags_changes"
       message = {:fwf_changes, {:updated, name, another_u_id}}
-      
+
       assert {:ok, ^cached_flag} = Cache.get(name)
       Phoenix.PubSub.broadcast!(client, channel, message)
       :timer.sleep(30)

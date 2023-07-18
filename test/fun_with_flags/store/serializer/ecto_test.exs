@@ -1,10 +1,10 @@
-defmodule FunWithFlags.Store.Serializer.EctoTest do
-  use FunWithFlags.TestCase, async: true
+defmodule ForkWithFlags.Store.Serializer.EctoTest do
+  use ForkWithFlags.TestCase, async: true
 
-  alias FunWithFlags.Flag
-  alias FunWithFlags.Gate
-  alias FunWithFlags.Store.Persistent.Ecto.Record
-  alias FunWithFlags.Store.Serializer.Ecto, as: Serializer
+  alias ForkWithFlags.Flag
+  alias ForkWithFlags.Gate
+  alias ForkWithFlags.Store.Persistent.Ecto.Record
+  alias ForkWithFlags.Store.Serializer.Ecto, as: Serializer
 
   setup do
     flag_name = "chicken"

@@ -1,8 +1,8 @@
-defmodule FunWithFlags.GateTest do
-  use FunWithFlags.TestCase, async: true
+defmodule ForkWithFlags.GateTest do
+  use ForkWithFlags.TestCase, async: true
 
-  alias FunWithFlags.Gate
-  alias FunWithFlags.TestUser
+  alias ForkWithFlags.Gate
+  alias ForkWithFlags.TestUser
 
   describe "new()" do
     test "new(:boolean, true|false) returns a new Boolean Gate" do
@@ -18,8 +18,8 @@ defmodule FunWithFlags.GateTest do
     end
 
     test "new(:percentage_of_time, ratio_f) with an invalid ratio raises an exception" do
-      assert_raise FunWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_time, 0.0) end
-      assert_raise FunWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_time, 1.0) end
+      assert_raise ForkWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_time, 0.0) end
+      assert_raise ForkWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_time, 1.0) end
     end
 
     test "new(:percentage_of_actors, ratio_f) retrurns a PercentageOfActors gate" do
@@ -30,8 +30,8 @@ defmodule FunWithFlags.GateTest do
     end
 
     test "new(:percentage_of_actors, ratio_f) with an invalid ratio raises an exception" do
-      assert_raise FunWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_actors, 0.0) end
-      assert_raise FunWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_actors, 1.0) end
+      assert_raise ForkWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_actors, 0.0) end
+      assert_raise ForkWithFlags.Gate.InvalidTargetError, fn() -> Gate.new(:percentage_of_actors, 1.0) end
     end
 
     test "new(:actor, actor, true|false) returns a new Actor Gate" do
@@ -62,8 +62,8 @@ defmodule FunWithFlags.GateTest do
     end
 
     test "new(:group, ...) with a name that is not an atom or a binary raises an exception" do
-      assert_raise FunWithFlags.Gate.InvalidGroupNameError, fn() -> Gate.new(:group, 123, true) end
-      assert_raise FunWithFlags.Gate.InvalidGroupNameError, fn() -> Gate.new(:group, %{a: "map"}, false) end
+      assert_raise ForkWithFlags.Gate.InvalidGroupNameError, fn() -> Gate.new(:group, 123, true) end
+      assert_raise ForkWithFlags.Gate.InvalidGroupNameError, fn() -> Gate.new(:group, %{a: "map"}, false) end
     end
   end
 
@@ -159,7 +159,7 @@ defmodule FunWithFlags.GateTest do
       assert :ignore = Gate.enabled?(gate, for: nil)
       assert :ignore = Gate.enabled?(gate, for: "pompelmo")
       assert :ignore = Gate.enabled?(gate, for: [1,2,3])
-      assert :ignore = Gate.enabled?(gate, for: {:a, "tuple"})   
+      assert :ignore = Gate.enabled?(gate, for: {:a, "tuple"})
     end
   end
 

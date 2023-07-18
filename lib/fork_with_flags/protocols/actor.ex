@@ -1,4 +1,4 @@
-defprotocol FunWithFlags.Actor do
+defprotocol ForkWithFlags.Actor do
   @moduledoc ~S"""
   Implement this protocol to provide actors.
 
@@ -17,7 +17,7 @@ defprotocol FunWithFlags.Actor do
 
 
   In order to be used as an actor, an entity must implement
-  the `FunWithFlags.Actor` protocol. This can be implemented for custom structs
+  the `ForkWithFlags.Actor` protocol. This can be implemented for custom structs
   or literally any other type.
 
 
@@ -29,7 +29,7 @@ defprotocol FunWithFlags.Actor do
         defstruct [:id, :name]
       end
 
-      defimpl FunWithFlags.Actor, for: MyApp.User do
+      defimpl ForkWithFlags.Actor, for: MyApp.User do
         def id(%{id: id}) do
           "user:#{id}"
         end
@@ -38,18 +38,18 @@ defprotocol FunWithFlags.Actor do
       bruce = %User{id: 1, name: "Bruce"}
       alfred = %User{id: 2, name: "Alfred"}
 
-      FunWithFlags.Actor.id(bruce)
+      ForkWithFlags.Actor.id(bruce)
       "user:1"
-      FunWithFlags.Actor.id(alfred)
+      ForkWithFlags.Actor.id(alfred)
       "user:2"
 
-      FunWithFlags.enable(:batmobile, for_actor: bruce)
+      ForkWithFlags.enable(:batmobile, for_actor: bruce)
 
 
   but it can also be implemented for the builtin types:
 
 
-      defimpl FunWithFlags.Actor, for: Map do
+      defimpl ForkWithFlags.Actor, for: Map do
         def id(%{actor_id: actor_id}) do
           "map:#{actor_id}"
         end
@@ -64,22 +64,22 @@ defprotocol FunWithFlags.Actor do
       end
 
 
-      defimpl FunWithFlags.Actor, for: BitString do
+      defimpl ForkWithFlags.Actor, for: BitString do
         def id(str) do
           "string:#{str}"
         end
       end
 
-      FunWithFlags.Actor.id(%{actor_id: "bar"})
+      ForkWithFlags.Actor.id(%{actor_id: "bar"})
       "map:bar"
-      FunWithFlags.Actor.id(%{foo: "bar"})
+      ForkWithFlags.Actor.id(%{foo: "bar"})
       "map:E0BB5BA6873E3AC34B0B6928190C1F2B"
-      FunWithFlags.Actor.id("foobar")
+      ForkWithFlags.Actor.id("foobar")
       "string:foobar"
 
 
-      FunWithFlags.disable(:foobar, for_actor: %{actor_id: "just a map"})
-      FunWithFlags.enable(:foobar, for_actor: "just a string")
+      ForkWithFlags.disable(:foobar, for_actor: %{actor_id: "just a map"})
+      ForkWithFlags.enable(:foobar, for_actor: "just a string")
 
 
   Actor identifiers must be globally unique binaries. Since supporting multiple
@@ -87,13 +87,13 @@ defprotocol FunWithFlags.Actor do
   technique of namespacing the IDs:
 
 
-      defimpl FunWithFlags.Actor, for: MyApp.User do
+      defimpl ForkWithFlags.Actor, for: MyApp.User do
         def id(user) do
           "user:#{user.id}"
         end
       end
 
-      defimpl FunWithFlags.Actor, for: MyApp.Country do
+      defimpl ForkWithFlags.Actor, for: MyApp.Country do
         def id(country) do
           "country:#{country.iso3166}"
         end
@@ -106,7 +106,7 @@ defprotocol FunWithFlags.Actor do
 
   ## Example
 
-      iex> FunWithFlags.Actor.id(%FunWithFlags.TestUser{id: 313})
+      iex> ForkWithFlags.Actor.id(%ForkWithFlags.TestUser{id: 313})
       "user:313"
 
   """
@@ -115,10 +115,10 @@ defprotocol FunWithFlags.Actor do
 end
 
 
-defmodule FunWithFlags.Actor.Percentage do
+defmodule ForkWithFlags.Actor.Percentage do
   @moduledoc false
 
-  alias FunWithFlags.Actor
+  alias ForkWithFlags.Actor
 
   # Combine an actor id and a flag name to get
   # a score. The flag name must be included to
@@ -148,7 +148,7 @@ defmodule FunWithFlags.Actor.Percentage do
   def distributions(count, flag_name) do
     key_fun = fn(i) ->
       a = %{actor_id: i}
-      score = FunWithFlags.Actor.Percentage.score(a, flag_name)
+      score = ForkWithFlags.Actor.Percentage.score(a, flag_name)
       round(score * 100)
     end
 
