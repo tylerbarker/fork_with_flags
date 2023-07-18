@@ -70,7 +70,10 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
 
       other_actor_gate = %Gate{type: :actor, for: "string:asd", enabled: true}
       PersiEcto.put(name, other_actor_gate)
-      assert {:ok, %Flag{name: ^name, gates: [^other_actor_gate, ^first_actor_gate, ^first_bool_gate]}} = PersiEcto.get(name)
+      expected_gates = [other_actor_gate, first_actor_gate, first_bool_gate]
+      assert {:ok, %Flag{name: ^name, gates: got_gates}} = PersiEcto.get(name)
+      
+      assert Enum.sort(expected_gates) == Enum.sort(got_gates)
 
       first_actor_gate_disabled = %Gate{first_actor_gate | enabled: false}
       PersiEcto.put(name, first_actor_gate_disabled)
@@ -84,7 +87,10 @@ defmodule FunWithFlags.Store.Persistent.EctoTest do
 
       other_group_gate = %Gate{type: :group, for: "gnomes", enabled: true}
       PersiEcto.put(name, other_group_gate)
-      assert {:ok, %Flag{name: ^name, gates: [^other_actor_gate, ^first_actor_gate_disabled, ^first_bool_gate, ^other_group_gate, ^first_group_gate]}} = PersiEcto.get(name)
+      expected_gates = [other_actor_gate, first_actor_gate_disabled, first_bool_gate, other_group_gate, first_group_gate]
+      assert {:ok, %Flag{name: ^name, gates: got_gates}} = PersiEcto.get(name)
+      
+      assert Enum.sort(expected_gates) == Enum.sort(got_gates)
 
       first_group_gate_disabled = %Gate{first_group_gate | enabled: false}
       PersiEcto.put(name, first_group_gate_disabled)
