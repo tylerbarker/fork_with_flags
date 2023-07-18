@@ -7,7 +7,9 @@ if FunWithFlags.Config.persist_in_ecto? do
       "mysql" ->
         # Ecto.Adapters.MySQL # mariaex, legacy
         Ecto.Adapters.MyXQL # myxql, introduced in ecto_sql 3.1
-      _ ->
+      "sqlite" ->
+        Ecto.Adapters.SQLite3
+        _ ->
         Ecto.Adapters.Postgres
     end)
 
