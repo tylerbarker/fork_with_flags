@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.11.0
+
+* Add support for SQLite with the [`ecto_sqlite3`](https://hex.pm/packages/ecto_sqlite3) adapter.
+
 ## v1.10.1
 
 * Redis notifications adapter: minor internal changes to what data is passed to the supervisor in the child spec. ([pull/148](https://github.com/tompave/fun_with_flags/pull/148))
