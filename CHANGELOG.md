@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.11.2
+
+* Mistake in README.
+
 ## v1.11.1
 
 * README updates.

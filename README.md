@@ -23,7 +23,7 @@ I tried my best to keep the original naming of `fun_with_flags`, `FunWithFlags`,
 
 A few things you'll have to do to integrate the fork...
 
-### 0. Don't change the table names, or the endpoint subscription
+### 0. Don't change the table names
 
 To ease migration to the fork, I've intentionally not changed anything about the default migrations and table names. The default table name remains `fun_with_flags_toggles`. So, when it comes to replacing `fun_with_flags` all over the place, keep the `ecto_table_name: "fun_with_flags_toggles"` config intact - unless you're already using a custom name.
 
