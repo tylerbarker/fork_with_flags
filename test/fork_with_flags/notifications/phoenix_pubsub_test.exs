@@ -24,7 +24,6 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
     end
   end
 
-
   describe "publish_change(flag_name)" do
     setup do
       {:ok, name: unique_atom()}
@@ -45,20 +44,21 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
         :timer.sleep(10)
 
         assert called(
-          Phoenix.PubSub.broadcast!(
-            :fwf_test,
-            "fun_with_flags_changes",
-            {:fwf_changes, {:updated, name, u_id}}
-          )
-        )
+                 Phoenix.PubSub.broadcast!(
+                   :fwf_test,
+                   "fork_with_flags_changes",
+                   {:fwf_changes, {:updated, name, u_id}}
+                 )
+               )
       end
     end
 
     test "causes other subscribers to receive a Phoenix.PubSub notification", %{name: name} do
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       u_id = PubSub.unique_id()
 
-      :ok = Phoenix.PubSub.subscribe(:fwf_test, channel) # implicit self
+      # implicit self
+      :ok = Phoenix.PubSub.subscribe(:fwf_test, channel)
 
       assert {:ok, _pid} = PubSub.publish_change(name)
 
@@ -67,20 +67,20 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
       receive do
         {:fwf_changes, ^payload} -> :ok
       after
-        500 -> flunk "Haven't received any message after 0.5 seconds"
+        500 -> flunk("Haven't received any message after 0.5 seconds")
       end
 
       # cleanup
 
-      :ok = Phoenix.PubSub.unsubscribe(:fwf_test, channel) # implicit self
+      # implicit self
+      :ok = Phoenix.PubSub.unsubscribe(:fwf_test, channel)
     end
   end
-
 
   test "it receives messages if something is published on Phoenix.PubSub" do
     u_id = PubSub.unique_id()
     client = ForkWithFlags.Config.pubsub_client()
-    channel = "fun_with_flags_changes"
+    channel = "fork_with_flags_changes"
     message = {:fwf_changes, {:updated, :foobar, u_id}}
 
     with_mock(PubSub, [:passthrough], []) do
@@ -88,21 +88,17 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
 
       :timer.sleep(1)
 
-      assert called(
-        PubSub.handle_info(message, u_id)
-      )
+      assert called(PubSub.handle_info(message, u_id))
     end
   end
-
 
   describe "integration: message handling" do
     alias ForkWithFlags.{Store, Config}
 
-
     test "when the message comes from this same process, it is ignored" do
       u_id = PubSub.unique_id()
       client = ForkWithFlags.Config.pubsub_client()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = {:fwf_changes, {:updated, :a_flag_name, u_id}}
 
       with_mock(Store, [:passthrough], []) do
@@ -112,13 +108,12 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
       end
     end
 
-
     test "when the message comes from another process, it reloads the flag" do
       another_u_id = Config.build_unique_id()
       refute another_u_id == PubSub.unique_id()
 
       client = ForkWithFlags.Config.pubsub_client()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = {:fwf_changes, {:updated, :a_flag_name, another_u_id}}
 
       with_mock(Store, [:passthrough], []) do
@@ -128,7 +123,6 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
       end
     end
   end
-
 
   describe "integration: side effects" do
     alias ForkWithFlags.Store.Cache
@@ -142,23 +136,25 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
       gate2 = %Gate{type: :boolean, enabled: false}
       cached_flag = %Flag{name: name, gates: [gate2]}
 
-      {:ok, ^stored_flag} = Config.persistence_adapter.put(name, gate)
+      {:ok, ^stored_flag} = Config.persistence_adapter().put(name, gate)
       :timer.sleep(10)
       {:ok, ^cached_flag} = Cache.put(cached_flag)
 
-      assert {:ok, ^stored_flag} = Config.persistence_adapter.get(name)
+      assert {:ok, ^stored_flag} = Config.persistence_adapter().get(name)
       assert {:ok, ^cached_flag} = Cache.get(name)
 
-      refute match? ^stored_flag, cached_flag
+      refute match?(^stored_flag, cached_flag)
 
       {:ok, name: name, stored_flag: stored_flag, cached_flag: cached_flag}
     end
 
-
-    test "when the message comes from this same process, the Cached value is not changed", %{name: name, cached_flag: cached_flag} do
+    test "when the message comes from this same process, the Cached value is not changed", %{
+      name: name,
+      cached_flag: cached_flag
+    } do
       u_id = PubSub.unique_id()
       client = ForkWithFlags.Config.pubsub_client()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = {:fwf_changes, {:updated, name, u_id}}
 
       Phoenix.PubSub.broadcast!(client, channel, message)
@@ -166,13 +162,16 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSubTest do
       assert {:ok, ^cached_flag} = Cache.get(name)
     end
 
-
-    test "when the message comes from another process, the Cached value is reloaded", %{name: name, cached_flag: cached_flag, stored_flag: stored_flag} do
+    test "when the message comes from another process, the Cached value is reloaded", %{
+      name: name,
+      cached_flag: cached_flag,
+      stored_flag: stored_flag
+    } do
       another_u_id = Config.build_unique_id()
       refute another_u_id == PubSub.unique_id()
 
       client = ForkWithFlags.Config.pubsub_client()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = {:fwf_changes, {:updated, name, another_u_id}}
 
       assert {:ok, ^cached_flag} = Cache.get(name)

@@ -109,7 +109,6 @@ defmodule ForkWithFlags.Notifications.RedisTest do
     end
   end
 
-
   describe "payload_for(flag_name)" do
     test "it returns a 2 item list" do
       flag_name = unique_atom()
@@ -123,14 +122,13 @@ defmodule ForkWithFlags.Notifications.RedisTest do
           name plus the unique_id for the GenServer" do
       flag_name = unique_atom()
       u_id = NotifiRedis.unique_id()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
 
-      assert [^channel, << blob :: binary >>] = NotifiRedis.payload_for(flag_name)
+      assert [^channel, <<blob::binary>>] = NotifiRedis.payload_for(flag_name)
       assert [^u_id, string] = String.split(blob, ":")
       assert ^flag_name = String.to_atom(string)
     end
   end
-
 
   describe "publish_change(flag_name)" do
     setup do
@@ -152,25 +150,29 @@ defmodule ForkWithFlags.Notifications.RedisTest do
         :timer.sleep(10)
 
         assert called(
-          Redix.command(
-            ForkWithFlags.Store.Persistent.Redis,
-            ["PUBLISH", "fun_with_flags_changes", "#{u_id}:#{name}"]
-          )
-        )
+                 Redix.command(
+                   ForkWithFlags.Store.Persistent.Redis,
+                   ["PUBLISH", "fork_with_flags_changes", "#{u_id}:#{name}"]
+                 )
+               )
       end
     end
 
     test "causes other subscribers to receive a Redis notification", %{name: name} do
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       u_id = NotifiRedis.unique_id()
 
-      {:ok, receiver} = Redix.PubSub.start_link(Keyword.merge(ForkWithFlags.Config.redis_config, [sync_connect: true]))
+      {:ok, receiver} =
+        Redix.PubSub.start_link(
+          Keyword.merge(ForkWithFlags.Config.redis_config(), sync_connect: true)
+        )
+
       {:ok, ref} = Redix.PubSub.subscribe(receiver, channel, self())
 
       receive do
         {:redix_pubsub, ^receiver, ^ref, :subscribed, %{channel: ^channel}} -> :ok
       after
-        500 -> flunk "Subscribe didn't work"
+        500 -> flunk("Subscribe didn't work")
       end
 
       assert {:ok, _pid} = NotifiRedis.publish_change(name)
@@ -180,7 +182,7 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       receive do
         {:redix_pubsub, ^receiver, ^ref, :message, %{channel: ^channel, payload: ^payload}} -> :ok
       after
-        500 -> flunk "Haven't received any message after 0.5 seconds"
+        500 -> flunk("Haven't received any message after 0.5 seconds")
       end
 
       # cleanup
@@ -190,19 +192,18 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       receive do
         {:redix_pubsub, ^receiver, ^ref, :unsubscribed, %{channel: ^channel}} -> :ok
       after
-        500 -> flunk "Unsubscribe didn't work"
+        500 -> flunk("Unsubscribe didn't work")
       end
 
       Process.exit(receiver, :kill)
     end
   end
 
-
   test "it receives messages if something is published on Redis" do
     alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
 
     u_id = NotifiRedis.unique_id()
-    channel = "fun_with_flags_changes"
+    channel = "fork_with_flags_changes"
     pubsub_receiver_pid = GenServer.whereis(:fun_with_flags_notifications)
     message = "foobar"
 
@@ -213,28 +214,26 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       :timer.sleep(1)
 
       assert called(
-        NotifiRedis.handle_info(
-          {
-            :redix_pubsub,
-            pubsub_receiver_pid,
-            ref,
-            :message,
-            %{channel: channel, payload: message}
-          },
-          {u_id, ref}
-        )
-      )
+               NotifiRedis.handle_info(
+                 {
+                   :redix_pubsub,
+                   pubsub_receiver_pid,
+                   ref,
+                   :message,
+                   %{channel: channel, payload: message}
+                 },
+                 {u_id, ref}
+               )
+             )
     end
   end
-
 
   describe "integration: message handling" do
     alias ForkWithFlags.Store.Persistent.Redis, as: PersiRedis
     alias ForkWithFlags.{Store, Config}
 
-
     test "when the message is not valid, it is ignored" do
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
 
       with_mock(Store, [:passthrough], []) do
         Redix.command(PersiRedis, ["PUBLISH", channel, "foobar"])
@@ -243,10 +242,9 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       end
     end
 
-
     test "when the message comes from this same process, it is ignored" do
       u_id = NotifiRedis.unique_id()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = "#{u_id}:foobar"
 
       with_mock(Store, [:passthrough], []) do
@@ -256,12 +254,11 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       end
     end
 
-
     test "when the message comes from another process, it reloads the flag" do
       another_u_id = Config.build_unique_id()
       refute another_u_id == NotifiRedis.unique_id()
 
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = "#{another_u_id}:foobar"
 
       with_mock(Store, [:passthrough], []) do
@@ -271,7 +268,6 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       end
     end
   end
-
 
   describe "integration: side effects" do
     alias ForkWithFlags.Store.Cache
@@ -293,24 +289,28 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       assert {:ok, ^stored_flag} = PersiRedis.get(name)
       assert {:ok, ^cached_flag} = Cache.get(name)
 
-      refute match? ^stored_flag, cached_flag
+      refute match?(^stored_flag, cached_flag)
 
       {:ok, name: name, stored_flag: stored_flag, cached_flag: cached_flag}
     end
 
-
-    test "when the message is not valid, the Cached value is not changed", %{name: name, cached_flag: cached_flag} do
-      channel = "fun_with_flags_changes"
+    test "when the message is not valid, the Cached value is not changed", %{
+      name: name,
+      cached_flag: cached_flag
+    } do
+      channel = "fork_with_flags_changes"
 
       Redix.command(PersiRedis, ["PUBLISH", channel, to_string(name)])
       :timer.sleep(30)
       assert {:ok, ^cached_flag} = Cache.get(name)
     end
 
-
-    test "when the message comes from this same process, the Cached value is not changed", %{name: name, cached_flag: cached_flag} do
+    test "when the message comes from this same process, the Cached value is not changed", %{
+      name: name,
+      cached_flag: cached_flag
+    } do
       u_id = NotifiRedis.unique_id()
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = "#{u_id}:#{to_string(name)}"
 
       Redix.command(PersiRedis, ["PUBLISH", channel, message])
@@ -318,12 +318,15 @@ defmodule ForkWithFlags.Notifications.RedisTest do
       assert {:ok, ^cached_flag} = Cache.get(name)
     end
 
-
-    test "when the message comes from another process, the Cached value is reloaded", %{name: name, cached_flag: cached_flag, stored_flag: stored_flag} do
+    test "when the message comes from another process, the Cached value is reloaded", %{
+      name: name,
+      cached_flag: cached_flag,
+      stored_flag: stored_flag
+    } do
       another_u_id = Config.build_unique_id()
       refute another_u_id == NotifiRedis.unique_id()
 
-      channel = "fun_with_flags_changes"
+      channel = "fork_with_flags_changes"
       message = "#{another_u_id}:#{to_string(name)}"
 
       assert {:ok, ^cached_flag} = Cache.get(name)

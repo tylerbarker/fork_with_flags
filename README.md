@@ -3,13 +3,62 @@
 [![Mix Tests](https://github.com/tylerbarker/fork_with_flags/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tylerbarker/fork_with_flags/actions/workflows/test.yml?query=branch%3Amaster)
 [![Code Quality](https://github.com/tylerbarker/fork_with_flags/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/tylerbarker/fork_with_flags/actions/workflows/quality.yml?query=branch%3Amaster)  
 [![Hex.pm](https://img.shields.io/hexpm/v/fork_with_flags.svg)](https://hex.pm/packages/fork_with_flags)
-[![hexdocs.pm](https://img.shields.io/badge/docs-1.11.0-brightgreen.svg)](https://hexdocs.pm/fork_with_flags/1.11.0/ForkWithFlags.html)
+[![hexdocs.pm](https://img.shields.io/badge/docs-1.11.1-brightgreen.svg)](https://hexdocs.pm/fork_with_flags/1.11.1/ForkWithFlags.html)
 [![Hex.pm Downloads](https://img.shields.io/hexpm/dt/fork_with_flags)](https://hex.pm/packages/fork_with_flags)
 [![License](https://img.shields.io/hexpm/l/fork_with_flags.svg)](https://github.com/tylerbarker/fork_with_flags/blob/master/LICENSE.txt)
 [![ElixirWeekly](https://img.shields.io/badge/featured-ElixirWeekly-8e5ab5.svg)](https://elixirweekly.net/issues/43)
 [![ElixirCasts](https://img.shields.io/badge/featured-ElixirCasts-ff931e.svg)](https://elixircasts.io/feature-flags)
 
-ForkWithFlags, the Elixir feature flag library.
+## A note on the fork
+
+This is a temporary fork of [tompave](https://github.com/tompave)'s excellent [fun_with_flags](https://github.com/tompave/fun_with_flags) library. It seems that the original library is not actively maintained at the moment, so I've created this fork. For my case, specifically to integrate unmerged changes which add support for SQLite as a database adapter. That being said I'm also happy to review and accept other contributions to the library while the original repository remains in stasis.
+
+I in no way take credit for, or attribute myself to, this library. All that goes to [tompave](https://github.com/tompave), whom I'm happy to hand this work back over to if and whenever the time comes.
+
+Thanks ✌️
+
+## Switching from fun_with_flags
+
+I tried my best to keep the original naming of `fun_with_flags`, `FunWithFlags`, etc, but I was unable to do so in a way that made the compiler happy, and I've done this to publish on Hex so `fork_with_flags` it is!
+
+A few things you'll have to do to integrate the fork...
+
+### 0. Don't change the table names, or the endpoint subscription
+
+To ease migration to the fork, I've intentionally not changed anything about the default migrations and table names. The default table name remains `fun_with_flags_toggles`. So, when it comes to replacing `fun_with_flags` all over the place, keep the `ecto_table_name: "fun_with_flags_toggles"` config intact - unless you're already using a custom name.
+
+### 1. Switch packages in mix.exs
+
+Unlock the dependencies:
+```shell
+mix deps.unlock fun_with_flags
+mix deps.unlock fun_with_flags_ui # if necessary
+```
+
+Then update the package names and install, re-compile, etc:
+
+```elixir
+{:fork_with_flags, "~> 1.11.1"},
+{:fork_with_flags_ui, "~> 0.8.1"}, # if necessary
+```
+
+### 2. Replace fun_with_flags -> fork_with_flags
+
+Remember: Leave the `:ecto_table_name` configuration option intact unless you're using a custom table name already.
+
+You'll find `fun_with_flags` all around in places like `included_applications: [...]`, `dialyzer: [...]`, etc. Replace those with `fun_with_flags`.
+
+Also ensure your replace all covers `Endpoint.subscribe("fork_with_flags_changes")` to become `Endpoint.subscribe("fork_with_flags_changes")`.
+
+### 3. Replace FunWithFlags -> ForkWithFlags
+
+Usage of the library itself will also need to be replaced, from `FunWithFlags` to `ForkWithFlags`.
+
+That's about it!
+
+## README
+
+ForkWithFlags, a fork on the Elixir feature flag library [fun_with_flags](https://github.com/tompave/fun_with_flags).
 
 If you're reading this on the [GitHub repo](https://github.com/tylerbarker/fork_with_flags), keep in mind that this readme refers to the `master` branch. For the latest version released on Hex, please check [the readme published with the docs](https://hexdocs.pm/fork_with_flags/readme.html).
 

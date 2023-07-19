@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.11.1
+
+* README updates.
+* Update broadcast channel to `"fork_with_flags_changes"`.
+
 ## v1.11.0
 
 * Add support for SQLite with the [`ecto_sqlite3`](https://hex.pm/packages/ecto_sqlite3) adapter.

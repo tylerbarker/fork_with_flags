@@ -6,7 +6,7 @@ defmodule ForkWithFlags.Notifications.PhoenixPubSub do
   require Logger
   alias ForkWithFlags.{Config, Store}
 
-  @channel "fun_with_flags_changes"
+  @channel "fork_with_flags_changes"
   @max_attempts 5
 
 

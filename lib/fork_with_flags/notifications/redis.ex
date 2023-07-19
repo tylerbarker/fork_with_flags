@@ -12,7 +12,7 @@ defmodule ForkWithFlags.Notifications.Redis do
 
   @conn :fun_with_flags_notifications
   @conn_options [name: @conn, sync_connect: false]
-  @channel "fun_with_flags_changes"
+  @channel "fork_with_flags_changes"
 
   # Retrieve the configuration to connect to Redis, and package it as an argument
   # to be passed to the start_link function.
