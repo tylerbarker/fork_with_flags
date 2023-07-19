@@ -2,7 +2,7 @@ defmodule ForkWithFlags.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/tylerbarker/fork_with_flags"
-  @version "1.11.1"
+  @version "1.11.2"
 
   def project do
     [
