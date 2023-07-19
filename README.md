@@ -1,23 +1,72 @@
-# FunWithFlags
+# ForkWithFlags
 
-[![Mix Tests](https://github.com/tompave/fun_with_flags/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tompave/fun_with_flags/actions/workflows/test.yml?query=branch%3Amaster)
-[![Code Quality](https://github.com/tompave/fun_with_flags/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/tompave/fun_with_flags/actions/workflows/quality.yml?query=branch%3Amaster)  
-[![Hex.pm](https://img.shields.io/hexpm/v/fun_with_flags.svg)](https://hex.pm/packages/fun_with_flags)
-[![hexdocs.pm](https://img.shields.io/badge/docs-1.10.1-brightgreen.svg)](https://hexdocs.pm/fun_with_flags/1.10.1/FunWithFlags.html)
-[![Hex.pm Downloads](https://img.shields.io/hexpm/dt/fun_with_flags)](https://hex.pm/packages/fun_with_flags)
-[![License](https://img.shields.io/hexpm/l/fun_with_flags.svg)](https://github.com/tompave/fun_with_flags/blob/master/LICENSE.txt)
+[![Mix Tests](https://github.com/tylerbarker/fork_with_flags/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tylerbarker/fork_with_flags/actions/workflows/test.yml?query=branch%3Amaster)
+[![Code Quality](https://github.com/tylerbarker/fork_with_flags/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/tylerbarker/fork_with_flags/actions/workflows/quality.yml?query=branch%3Amaster)  
+[![Hex.pm](https://img.shields.io/hexpm/v/fork_with_flags.svg)](https://hex.pm/packages/fork_with_flags)
+[![hexdocs.pm](https://img.shields.io/badge/docs-1.11.1-brightgreen.svg)](https://hexdocs.pm/fork_with_flags/1.11.1/ForkWithFlags.html)
+[![Hex.pm Downloads](https://img.shields.io/hexpm/dt/fork_with_flags)](https://hex.pm/packages/fork_with_flags)
+[![License](https://img.shields.io/hexpm/l/fork_with_flags.svg)](https://github.com/tylerbarker/fork_with_flags/blob/master/LICENSE.txt)
 [![ElixirWeekly](https://img.shields.io/badge/featured-ElixirWeekly-8e5ab5.svg)](https://elixirweekly.net/issues/43)
 [![ElixirCasts](https://img.shields.io/badge/featured-ElixirCasts-ff931e.svg)](https://elixircasts.io/feature-flags)
 
-FunWithFlags, the Elixir feature flag library.
+## A note on the fork
 
-If you're reading this on the [GitHub repo](https://github.com/tompave/fun_with_flags), keep in mind that this readme refers to the `master` branch. For the latest version released on Hex, please check [the readme published with the docs](https://hexdocs.pm/fun_with_flags/readme.html).
+This is a temporary fork of [tompave](https://github.com/tompave)'s excellent [fun_with_flags](https://github.com/tompave/fun_with_flags) library. It seems that the original library is not actively maintained at the moment, so I've created this fork. For my case, specifically to integrate unmerged changes which add support for SQLite as a database adapter. That being said I'm also happy to review and accept other contributions to the library while the original repository remains in stasis.
+
+I in no way take credit for, or attribute myself to, this library. All that goes to [tompave](https://github.com/tompave), whom I'm happy to hand this work back over to if and whenever the time comes.
+
+Thanks ✌️
+
+## Switching from fun_with_flags
+
+I tried my best to keep the original naming of `fun_with_flags`, `FunWithFlags`, etc, but I was unable to do so in a way that made the compiler happy, and I've done this to publish on Hex so `fork_with_flags` it is!
+
+A few things you'll have to do to integrate the fork...
+
+### 0. Don't change the table names, or the endpoint subscription
+
+To ease migration to the fork, I've intentionally not changed anything about the default migrations and table names. The default table name remains `fun_with_flags_toggles`. So, when it comes to replacing `fun_with_flags` all over the place, keep the `ecto_table_name: "fun_with_flags_toggles"` config intact - unless you're already using a custom name.
+
+### 1. Switch packages in mix.exs
+
+Unlock the dependencies:
+```shell
+mix deps.unlock fun_with_flags
+mix deps.unlock fun_with_flags_ui # if necessary
+```
+
+Then update the package names and install, re-compile, etc:
+
+```elixir
+{:fork_with_flags, "~> 1.11.1"},
+{:fork_with_flags_ui, "~> 0.8.1"}, # if necessary
+```
+
+### 2. Replace fun_with_flags -> fork_with_flags
+
+Remember: Leave the `:ecto_table_name` configuration option intact unless you're using a custom table name already.
+
+You'll find `fun_with_flags` all around in places like `included_applications: [...]`, `dialyzer: [...]`, etc. Replace those with `fun_with_flags`.
+
+Also ensure your replace all covers `Endpoint.subscribe("fork_with_flags_changes")` to become `Endpoint.subscribe("fork_with_flags_changes")`.
+
+### 3. Replace FunWithFlags -> ForkWithFlags
+
+Usage of the library itself will also need to be replaced, from `FunWithFlags` to `ForkWithFlags`.
+
+That's about it!
+
+## README
+
+ForkWithFlags, a fork on the Elixir feature flag library [fun_with_flags](https://github.com/tompave/fun_with_flags).
+
+If you're reading this on the [GitHub repo](https://github.com/tylerbarker/fork_with_flags), keep in mind that this readme refers to the `master` branch. For the latest version released on Hex, please check [the readme published with the docs](https://hexdocs.pm/fork_with_flags/readme.html).
 
 ---
 
-FunWithFlags is an OTP application that provides a 2-level storage to save and retrieve feature flags, an Elixir API to toggle and query them, and a [web dashboard](#web-dashboard) as control panel.
+ForkWithFlags is an OTP application that provides a 2-level storage to save and retrieve feature flags, an Elixir API to toggle and query them, and a [web dashboard](#web-dashboard) as control panel.
 
-It stores flag information in Redis or a relational DB (PostgreSQL or MySQL, with Ecto) for persistence and synchronization across different nodes, but it also maintains a local cache in an ETS table for fast lookups. When flags are added or toggled on a node, the other nodes are notified via PubSub and reload their local ETS caches.
+It stores flag information in Redis or a relational DB (PostgreSQL, MySQL, or SQLite - with Ecto) for persistence and synchronization across different nodes, but it also maintains a local cache in an ETS table for fast lookups. When flags are added or toggled on a node, the other nodes are notified via PubSub and reload their local ETS caches.
 
 ## Content
 
@@ -58,13 +107,13 @@ They can also be used to implement a simple authorization system, for example to
 
 ## Usage
 
-FunWithFlags has a simple API to query and toggle feature flags. Most of the time, you'll call `FunWithFlags.enabled?/2` with the name of the flag and optional arguments.
+ForkWithFlags has a simple API to query and toggle feature flags. Most of the time, you'll call `ForkWithFlags.enabled?/2` with the name of the flag and optional arguments.
 
 Different kinds of toggle gates are supported:
 
 * **Boolean**: globally on and off.
-* **Actors**: on or off for specific structs or data. The `FunWithFlags.Actor` protocol can be implemented for types and structs that should have specific rules. For example, in web applications it's common to use a `%User{}` struct or equivalent as an actor, or perhaps the current country of the request.
-* **Groups**: on or off for structs or data that belong to a category or satisfy a condition. The `FunWithFlags.Group` protocol can be implemented for types and structs that belong to groups for which a feature flag can be enabled or disabled. For example, one could implement the protocol for a `%User{}` struct to identify administrators.
+* **Actors**: on or off for specific structs or data. The `ForkWithFlags.Actor` protocol can be implemented for types and structs that should have specific rules. For example, in web applications it's common to use a `%User{}` struct or equivalent as an actor, or perhaps the current country of the request.
+* **Groups**: on or off for structs or data that belong to a category or satisfy a condition. The `ForkWithFlags.Group` protocol can be implemented for types and structs that belong to groups for which a feature flag can be enabled or disabled. For example, one could implement the protocol for a `%User{}` struct to identify administrators.
 * **%-of-Time**: globally on for a percentage of the time. It ignores actors and groups. Mutually exclusive with the %-of-actors gate.
 * **%-of-Actors**: globally on for a percentage of the actors. It only applies when the flag is checked with a specific actor and is ignored when the flag is checked without actor arguments. Mutually exclusive with the %-of-time gate.
 
@@ -83,17 +132,17 @@ As another example, a flag can have a disabled boolean gate and a 50% enabled %-
 The boolean gate is the simplest one. It's either enabled or disabled, globally. It's also the gate with the second lowest priority (it can mask the percentage gates). If a flag is undefined, it defaults to be globally disabled.
 
 ```elixir
-FunWithFlags.enabled?(:cool_new_feature)
+ForkWithFlags.enabled?(:cool_new_feature)
 false
 
-{:ok, true} = FunWithFlags.enable(:cool_new_feature)
+{:ok, true} = ForkWithFlags.enable(:cool_new_feature)
 
-FunWithFlags.enabled?(:cool_new_feature)
+ForkWithFlags.enabled?(:cool_new_feature)
 true
 
-{:ok, false} = FunWithFlags.disable(:cool_new_feature)
+{:ok, false} = ForkWithFlags.disable(:cool_new_feature)
 
-FunWithFlags.enabled?(:cool_new_feature)
+ForkWithFlags.enabled?(:cool_new_feature)
 false
 ```
 
@@ -103,7 +152,7 @@ This allows you to enable or disable a flag for one or more entities. For exampl
 
 Actor gates take precedence over the others, both when they're enabled and when they're disabled. They can be considered as toggle overrides.
 
-In order to be used as an actor, an entity must implement the `FunWithFlags.Actor` protocol. This can be implemented for custom structs or literally any other type.
+In order to be used as an actor, an entity must implement the `ForkWithFlags.Actor` protocol. This can be implemented for custom structs or literally any other type.
 
 
 ```elixir
@@ -111,7 +160,7 @@ defmodule MyApp.User do
   defstruct [:id, :name]
 end
 
-defimpl FunWithFlags.Actor, for: MyApp.User do
+defimpl ForkWithFlags.Actor, for: MyApp.User do
   def id(%{id: id}) do
     "user:#{id}"
   end
@@ -120,12 +169,12 @@ end
 bruce = %MyApp.User{id: 1, name: "Bruce"}
 alfred = %MyApp.User{id: 2, name: "Alfred"}
 
-FunWithFlags.Actor.id(bruce)
+ForkWithFlags.Actor.id(bruce)
 "user:1"
-FunWithFlags.Actor.id(alfred)
+ForkWithFlags.Actor.id(alfred)
 "user:2"
 
-defimpl FunWithFlags.Actor, for: Map do
+defimpl ForkWithFlags.Actor, for: Map do
   def id(%{actor_id: actor_id}) do
     "map:#{actor_id}"
   end
@@ -139,45 +188,45 @@ defimpl FunWithFlags.Actor, for: Map do
   end
 end
 
-FunWithFlags.Actor.id(%{actor_id: "bar"})
+ForkWithFlags.Actor.id(%{actor_id: "bar"})
 "map:bar"
-FunWithFlags.Actor.id(%{foo: "bar"})
+ForkWithFlags.Actor.id(%{foo: "bar"})
 "map:E0BB5BA6873E3AC34B0B6928190C1F2B"
 ```
 
 With the protocol implemented, actors can be used with the library functions:
 
 ```elixir
-{:ok, true} = FunWithFlags.enable(:restful_nights)
-{:ok, false} = FunWithFlags.disable(:restful_nights, for_actor: bruce)
-{:ok, true} = FunWithFlags.enable(:batmobile, for_actor: bruce)
+{:ok, true} = ForkWithFlags.enable(:restful_nights)
+{:ok, false} = ForkWithFlags.disable(:restful_nights, for_actor: bruce)
+{:ok, true} = ForkWithFlags.enable(:batmobile, for_actor: bruce)
 
-FunWithFlags.enabled?(:restful_nights)
+ForkWithFlags.enabled?(:restful_nights)
 true
-FunWithFlags.enabled?(:batmobile)
+ForkWithFlags.enabled?(:batmobile)
 false
 
-FunWithFlags.enabled?(:restful_nights, for: alfred)
+ForkWithFlags.enabled?(:restful_nights, for: alfred)
 true
-FunWithFlags.enabled?(:batmobile, for: alfred)
+ForkWithFlags.enabled?(:batmobile, for: alfred)
 false
 
-FunWithFlags.enabled?(:restful_nights, for: bruce)
+ForkWithFlags.enabled?(:restful_nights, for: bruce)
 false
-FunWithFlags.enabled?(:batmobile, for: bruce)
+ForkWithFlags.enabled?(:batmobile, for: bruce)
 true
 ```
 
 Actor identifiers must be globally unique binaries. Since supporting multiple kinds of actors is a common requirement, all the examples use the common technique of namespacing the IDs:
 
 ```elixir
-defimpl FunWithFlags.Actor, for: MyApp.User do
+defimpl ForkWithFlags.Actor, for: MyApp.User do
   def id(user) do
     "user:#{user.id}"
   end
 end
 
-defimpl FunWithFlags.Actor, for: MyApp.Country do
+defimpl ForkWithFlags.Actor, for: MyApp.Country do
   def id(country) do
     "country:#{country.iso3166}"
   end
@@ -195,7 +244,7 @@ Group names can be binaries or atoms. Atoms are supported for retro-compatibilit
 The semantics to determine which entities belong to which groups are application specific.
 Entities could have an explicit list of groups they belong to, or the groups could be abstract and inferred from some other attribute. For example, an `:employee` group could comprise all `%User{}` structs with an email address matching the company domain, or an `:admin` group could be made of all users with `%User{admin: true}`.
 
-In order to be affected by a group gate, an entity should implement the `FunWithFlags.Group` protocol. The protocol automatically falls back to a default `Any` implementation, which states that any entity belongs to no group at all. This makes it possible to safely use "normal" actors when querying group gates, and to implement the protocol only for structs and types for which it matters.
+In order to be affected by a group gate, an entity should implement the `ForkWithFlags.Group` protocol. The protocol automatically falls back to a default `Any` implementation, which states that any entity belongs to no group at all. This makes it possible to safely use "normal" actors when querying group gates, and to implement the protocol only for structs and types for which it matters.
 
 The protocol can be implemented for custom structs or literally any other type.
 
@@ -205,40 +254,40 @@ defmodule MyApp.User do
   defstruct [:email, admin: false, groups: []]
 end
 
-defimpl FunWithFlags.Group, for: MyApp.User do
+defimpl ForkWithFlags.Group, for: MyApp.User do
   def in?(%{email: email}, "employee"), do: Regex.match?(~r/@mycompany.com$/, email)
   def in?(%{admin: is_admin}, "admin"), do: !!is_admin
   def in?(%{groups: list}, group_name), do: group_name in list
 end
 
 elisabeth = %MyApp.User{email: "elisabeth@mycompany.com", admin: true, groups: ["engineering", "product"]}
-FunWithFlags.Group.in?(elisabeth, "employee")
+ForkWithFlags.Group.in?(elisabeth, "employee")
 true
-FunWithFlags.Group.in?(elisabeth, "admin")
+ForkWithFlags.Group.in?(elisabeth, "admin")
 true
-FunWithFlags.Group.in?(elisabeth, "engineering")
+ForkWithFlags.Group.in?(elisabeth, "engineering")
 true
-FunWithFlags.Group.in?(elisabeth, "marketing")
+ForkWithFlags.Group.in?(elisabeth, "marketing")
 false
 
-defimpl FunWithFlags.Group, for: Map do
+defimpl ForkWithFlags.Group, for: Map do
   def in?(%{group: group_name}, group_name), do: true
   def in?(_, _), do: false
 end
 
-FunWithFlags.Group.in?(%{group: "dumb_tests"}, "dumb_tests")
+ForkWithFlags.Group.in?(%{group: "dumb_tests"}, "dumb_tests")
 true
 ```
 
 With the protocol implemented, actors can be used with the library functions:
 
 ```elixir
-FunWithFlags.disable(:database_access)
-FunWithFlags.enable(:database_access, for_group: "engineering")
+ForkWithFlags.disable(:database_access)
+ForkWithFlags.enable(:database_access, for_group: "engineering")
 
-FunWithFlags.enabled?(:database_access)
+ForkWithFlags.enabled?(:database_access)
 false
-FunWithFlags.enabled?(:database_access, for: elisabeth)
+ForkWithFlags.enabled?(:database_access, for: elisabeth)
 true
 ```
 
@@ -255,11 +304,11 @@ A good use case for %-of-time gates is to safely test the correctness or perform
 For example:
 
 ```elixir
-FunWithFlags.clear(:alternative_implementation)
-FunWithFlags.enable(:alternative_implementation, for_percentage_of: {:time, 0.05})
+ForkWithFlags.clear(:alternative_implementation)
+ForkWithFlags.enable(:alternative_implementation, for_percentage_of: {:time, 0.05})
 
 def foo(bar) do
-  if FunWithFlags.enabled?(:alternative_implementation) do
+  if ForkWithFlags.enabled?(:alternative_implementation) do
     new_foo(bar)
   else
     old_foo(bar)
@@ -275,7 +324,7 @@ The %-of-time gate is incompatible and mutually exclusive with the %-of-actors g
 
 ```elixir
 actor
-|> FunWithFlags.Actor.id()
+|> ForkWithFlags.Actor.id()
 |> sha256_hash(flag_name)
 |> hash_to_percentage()
 ```
@@ -284,14 +333,14 @@ Since the scores depend on both the actor ID and the flag name, they're guarante
 
 Just like for the %-of-time gates, an actor's score is compared with the gate's percentage value and, if lower, the gate will result enabled.
 
-A practical example, based on the `FunWithFlags.Actor` protocol set up from the previous sections:
+A practical example, based on the `ForkWithFlags.Actor` protocol set up from the previous sections:
 
 ```elixir
 defmodule MyApp.User do
   defstruct [:id, :name]
 end
 
-defimpl FunWithFlags.Actor, for: MyApp.User do
+defimpl ForkWithFlags.Actor, for: MyApp.User do
   def id(%{id: id}) do
     "user:#{id}"
   end
@@ -302,36 +351,36 @@ sam    = %MyApp.User{id: 2, name: "Samwise Gamgee"}
 pippin = %MyApp.User{id: 3, name: "Peregrin Took"}
 merry  = %MyApp.User{id: 4, name: "Meriadoc Brandybuck"}
 
-FunWithFlags.Actor.Percentage.score(frodo, :pipeweed)
+ForkWithFlags.Actor.Percentage.score(frodo, :pipeweed)
 0.8658294677734375
-FunWithFlags.Actor.Percentage.score(sam, :pipeweed)
+ForkWithFlags.Actor.Percentage.score(sam, :pipeweed)
 0.68426513671875
-FunWithFlags.Actor.Percentage.score(pippin, :pipeweed)
+ForkWithFlags.Actor.Percentage.score(pippin, :pipeweed)
 0.510528564453125
-FunWithFlags.Actor.Percentage.score(merry, :pipeweed)
+ForkWithFlags.Actor.Percentage.score(merry, :pipeweed)
 0.2617645263671875
 
-{:ok, true} = FunWithFlags.enable(:pipeweed, for_percentage_of: {:actors, 0.60})
+{:ok, true} = ForkWithFlags.enable(:pipeweed, for_percentage_of: {:actors, 0.60})
 
-FunWithFlags.enabled?(:pipeweed, for: frodo)
+ForkWithFlags.enabled?(:pipeweed, for: frodo)
 false
-FunWithFlags.enabled?(:pipeweed, for: sam)
+ForkWithFlags.enabled?(:pipeweed, for: sam)
 false
-FunWithFlags.enabled?(:pipeweed, for: pippin)
+ForkWithFlags.enabled?(:pipeweed, for: pippin)
 true
-FunWithFlags.enabled?(:pipeweed, for: merry)
-true
-
-{:ok, true} = FunWithFlags.enable(:pipeweed, for_percentage_of: {:actors, 0.685})
-
-FunWithFlags.enabled?(:pipeweed, for: sam)
+ForkWithFlags.enabled?(:pipeweed, for: merry)
 true
 
-FunWithFlags.Actor.Percentage.score(pippin, :pipeweed)
+{:ok, true} = ForkWithFlags.enable(:pipeweed, for_percentage_of: {:actors, 0.685})
+
+ForkWithFlags.enabled?(:pipeweed, for: sam)
+true
+
+ForkWithFlags.Actor.Percentage.score(pippin, :pipeweed)
 0.510528564453125
-FunWithFlags.Actor.Percentage.score(pippin, :mushrooms)
+ForkWithFlags.Actor.Percentage.score(pippin, :mushrooms)
 0.6050872802734375
-FunWithFlags.Actor.Percentage.score(pippin, :palantir)
+ForkWithFlags.Actor.Percentage.score(pippin, :palantir)
 0.144073486328125
 ```
 
@@ -343,16 +392,16 @@ This is ideal to gradually roll out new functionality to users.
 For example, in a Phoenix application:
 
 ```elixir
-FunWithFlags.clear(:new_design)
-FunWithFlags.enable(:new_design, for_percentage_of: {:actors, 0.2})
-FunWithFlags.enable(:new_design, for_group: "beta_testers")
+ForkWithFlags.clear(:new_design)
+ForkWithFlags.enable(:new_design, for_percentage_of: {:actors, 0.2})
+ForkWithFlags.enable(:new_design, for_group: "beta_testers")
 
 
 defmodule MyPhoenixApp.MyView do
   use MyPhoenixApp, :view
 
   def render("my_template.html", assigns) do
-    if FunWithFlags.enabled?(:new_design, for: assigns.user) do
+    if ForkWithFlags.enabled?(:new_design, for: assigns.user) do
       render("new_template.html", assigns)
     else
       render("old_template.html", assigns)
@@ -370,83 +419,83 @@ Sometimes enabling or disabling a gate is not what you want, and removing that g
 More examples:
 
 ```elixir
-alias FunWithFlags.TestUser, as: User
+alias ForkWithFlags.TestUser, as: User
 harry = %User{id: 1, name: "Harry Potter", groups: ["wizards", "gryffindor"]}
 hagrid = %User{id: 2, name: "Rubeus Hagrid", groups: ["wizards", "gamekeeper"]}
 dudley = %User{id: 3, name: "Dudley Dursley", groups: ["muggles"]}
-FunWithFlags.disable(:wands)
-FunWithFlags.enable(:wands, for_group: "wizards")
-FunWithFlags.disable(:wands, for_actor: hagrid)
+ForkWithFlags.disable(:wands)
+ForkWithFlags.enable(:wands, for_group: "wizards")
+ForkWithFlags.disable(:wands, for_actor: hagrid)
 
-FunWithFlags.enabled?(:wands)
+ForkWithFlags.enabled?(:wands)
 false
-FunWithFlags.enabled?(:wands, for: harry)
+ForkWithFlags.enabled?(:wands, for: harry)
 true
-FunWithFlags.enabled?(:wands, for: hagrid)
+ForkWithFlags.enabled?(:wands, for: hagrid)
 false
-FunWithFlags.enabled?(:wands, for: dudley)
+ForkWithFlags.enabled?(:wands, for: dudley)
 false
 
-FunWithFlags.clear(:wands, for_actor: hagrid)
+ForkWithFlags.clear(:wands, for_actor: hagrid)
 
-FunWithFlags.enabled?(:wands, for: hagrid)
+ForkWithFlags.enabled?(:wands, for: hagrid)
 true
 
-FunWithFlags.clear(:wands, for_group: "wizards")
+ForkWithFlags.clear(:wands, for_group: "wizards")
 
-FunWithFlags.enabled?(:wands, for: hagrid)
+ForkWithFlags.enabled?(:wands, for: hagrid)
 false
-FunWithFlags.enabled?(:wands, for: harry)
+ForkWithFlags.enabled?(:wands, for: harry)
 false
 
-FunWithFlags.enable(:magic_powers, for_percentage_of: {:time, 0.0001})
-FunWithFlags.clear(:magic_powers, for_percentage: true)
+ForkWithFlags.enable(:magic_powers, for_percentage_of: {:time, 0.0001})
+ForkWithFlags.clear(:magic_powers, for_percentage: true)
 ```
 
 For completeness, clearing the boolean gate is also supported.
 
 ```elixir
-FunWithFlags.enable(:wands)
+ForkWithFlags.enable(:wands)
 
-FunWithFlags.enabled?(:wands)
+ForkWithFlags.enabled?(:wands)
 true
-FunWithFlags.enabled?(:wands, for: harry)
+ForkWithFlags.enabled?(:wands, for: harry)
 true
-FunWithFlags.enabled?(:wands, for: hagrid)
+ForkWithFlags.enabled?(:wands, for: hagrid)
 false
-FunWithFlags.enabled?(:wands, for: dudley)
+ForkWithFlags.enabled?(:wands, for: dudley)
 true
 
-FunWithFlags.clear(:wands, boolean: true)
+ForkWithFlags.clear(:wands, boolean: true)
 
-FunWithFlags.enabled?(:wands)
+ForkWithFlags.enabled?(:wands)
 false
-FunWithFlags.enabled?(:wands, for: harry)
+ForkWithFlags.enabled?(:wands, for: harry)
 true
-FunWithFlags.enabled?(:wands, for: hagrid)
+ForkWithFlags.enabled?(:wands, for: hagrid)
 false
-FunWithFlags.enabled?(:wands, for: dudley)
+ForkWithFlags.enabled?(:wands, for: dudley)
 false
 ```
 
 It's also possible to clear an entire flag.
 
 ```elixir
-FunWithFlags.clear(:wands)
+ForkWithFlags.clear(:wands)
 
-FunWithFlags.enabled?(:wands)
+ForkWithFlags.enabled?(:wands)
 false
-FunWithFlags.enabled?(:wands, for: harry)
+ForkWithFlags.enabled?(:wands, for: harry)
 false
-FunWithFlags.enabled?(:wands, for: hagrid)
+ForkWithFlags.enabled?(:wands, for: hagrid)
 false
-FunWithFlags.enabled?(:wands, for: dudley)
+ForkWithFlags.enabled?(:wands, for: dudley)
 false
 ```
 
 ## Web Dashboard
 
-An optional extension of this library is [`FunWithFlags.UI`](https://github.com/tompave/fun_with_flags_ui), a web graphical control panel. It's a Plug, so it can be embedded in a host Phoenix or Plug application or served standalone.
+An optional extension of this library is [`ForkWithFlags.UI`](https://github.com/tylerbarker/fork_with_flags_ui), a web graphical control panel. It's a Plug, so it can be embedded in a host Phoenix or Plug application or served standalone.
 
 
 ## Origin
@@ -458,7 +507,7 @@ Having used Flipper in production at scale, this project aims to improve in two 
 * Minimize the load on the persistence layer: feature flags are not toggled _that_ often, and there is no need to query Redis or the DB for each check.
 * Be more reliable: it should keep working with the latest cached values even if Redis becomes unavailable, although with the risk of nodes getting out of sync. (if the DB becomes unavailable, feature flags are probably the last of your problems)
 
-Just as Elixir and Phoenix are meant to scale better than Ruby on Rails with high levels of traffic and concurrency, FunWithFlags should aim to be more scalable and reliable than Flipper.
+Just as Elixir and Phoenix are meant to scale better than Ruby on Rails with high levels of traffic and concurrency, ForkWithFlags should aim to be more scalable and reliable than Flipper.
 
 ## So, caching, huh?
 
@@ -468,19 +517,19 @@ Just as Elixir and Phoenix are meant to scale better than Ruby on Rails with hig
 
 The reason to add an ETS cache is that, most of the time, feature flags can be considered static values. Doing a round-trip to the DB (Redis, PostgreSQL or MySQL) is expensive in terms of time and in terms of resources, especially if multiple flags must be checked during a single web request. In the worst cases, the load on the DB can become a cause of concern, a performance bottleneck or the source of a system failure.
 
-Often the solution is to memoize the flag values _in the context of the web request_, but the approach can be extended to the scope of the entire server. This is what FunWithFlags does, as each application node/instance caches the flags in an ETS table.
+Often the solution is to memoize the flag values _in the context of the web request_, but the approach can be extended to the scope of the entire server. This is what ForkWithFlags does, as each application node/instance caches the flags in an ETS table.
 
 Of course, caching adds a different kind of complexity and there are some pros and cons. When a flag is created or updated the ETS cache on the local node is updated immediately, and the main problem is synchronizing the flag data across the other application nodes that should share the same view of the world.
 
 For example, if we have two or more nodes running the application, and on one of them an admin user updates a flag that the others have already cached, or creates a flag that the others have already looked up (and cached as "disabled"), then the other nodes must  be notified of the changes.
 
-FunWithFlags uses three mechanisms to deal with the problem:
+ForkWithFlags uses three mechanisms to deal with the problem:
 
 1. Use PubSub to emit change notifications. All nodes subscribe to the same channel and reload flags in the ETS cache when required.
 2. If that fails, the cache has a configurable TTL. Reading from the DB every few minutes is still better than doing so 30k times per second.
 3. If that doesn't work, it's possible to disable the cache and just read from the DB all the time. That's what Flipper does.
 
-In terms of performance, very synthetic benchmarks (where the DBs run on the same machine as the Beam code, so with no network hop but sharing the CPU) show that the ETS cache makes querying the FunWithFlags interface between 10 and 20 times faster than going directly to Redis, and between 20 and 40 times faster than going directly to Postgres. The variance depends on the complexity of the flag data to be retrieved.
+In terms of performance, very synthetic benchmarks (where the DBs run on the same machine as the Beam code, so with no network hop but sharing the CPU) show that the ETS cache makes querying the ForkWithFlags interface between 10 and 20 times faster than going directly to Redis, and between 20 and 40 times faster than going directly to Postgres. The variance depends on the complexity of the flag data to be retrieved.
 
 ## To Do
 
@@ -488,14 +537,14 @@ In terms of performance, very synthetic benchmarks (where the DBs run on the sam
 
 ## Installation
 
-The package can be installed by adding `fun_with_flags` to your list of dependencies in `mix.exs`.
+The package can be installed by adding `fork_with_flags` to your list of dependencies in `mix.exs`.
 
 In order to have a small installation footprint, the dependencies for the different adapters are all optional. You must explicitly require the ones you wish to use.
 
 ```elixir
 def deps do
   [
-    {:fun_with_flags, "~> 1.10.1"},
+    {:fork_with_flags, "~> 1.11"},
 
     # either:
     {:redix, "~> 0.9"},
@@ -510,56 +559,56 @@ end
 
 Using `ecto_sql` for persisting the flags also requires an ecto adapter, e.g. `postgrex`, `mariaex` or `myxql`. Please refer to the Ecto documentation for the details.
 
-Since FunWithFlags depends on an Elixir more recent than 1.4, there is [no need to explicitly declare the application](https://github.com/elixir-lang/elixir/blob/v1.4/CHANGELOG.md#application-inference).
+Since ForkWithFlags depends on an Elixir more recent than 1.4, there is [no need to explicitly declare the application](https://github.com/elixir-lang/elixir/blob/v1.4/CHANGELOG.md#application-inference).
 
-If you need to customize how the `:fun_with_flags` application is loaded and started, refer to the [Application Start Behaviour](#application-start-behaviour) section, below in this document.
+If you need to customize how the `:fork_with_flags` application is loaded and started, refer to the [Application Start Behaviour](#application-start-behaviour) section, below in this document.
 
 ## Configuration
 
 The library can be configured in host applications through Mix and the `config.exs` file. This example shows some default values:
 
 ```elixir
-config :fun_with_flags, :cache,
+config :fork_with_flags, :cache,
   enabled: true,
   ttl: 900 # in seconds
 
 # the Redis persistence adapter is the default, no need to set this.
-config :fun_with_flags, :persistence,
-  [adapter: FunWithFlags.Store.Persistent.Redis]
+config :fork_with_flags, :persistence,
+  [adapter: ForkWithFlags.Store.Persistent.Redis]
 
 # this can be disabled if you are running on a single node and don't need to
 # sync different ETS caches. It won't have any effect if the cache is disabled.
 # The Redis PuSub adapter is the default, no need to set this.
-config :fun_with_flags, :cache_bust_notifications,
-  [enabled: true, adapter: FunWithFlags.Notifications.Redis]
+config :fork_with_flags, :cache_bust_notifications,
+  [enabled: true, adapter: ForkWithFlags.Notifications.Redis]
 
 # Notifications can also be disabled, which will also remove the Redis/Redix dependency
-config :fun_with_flags, :cache_bust_notifications, [enabled: false]
+config :fork_with_flags, :cache_bust_notifications, [enabled: false]
 ```
 
 When using Redis for persistence and/or cache-busting PubSub it is necessary to configure the connection to the Redis instance. These options can be omitted if Redis is not being used. For example, the defaults:
 
 ```elixir
 # the Redis options will be forwarded to Redix.
-config :fun_with_flags, :redis,
+config :fork_with_flags, :redis,
   host: "localhost",
   port: 6379,
   database: 0
 
 # a URL string can be used instead
-config :fun_with_flags, :redis, "redis://localhost:6379/0"
+config :fork_with_flags, :redis, "redis://localhost:6379/0"
 
 # or a {URL, [opts]} tuple
-config :fun_with_flags, :redis, {"redis://localhost:6379/0", socket_opts: [:inet6]}
+config :fork_with_flags, :redis, {"redis://localhost:6379/0", socket_opts: [:inet6]}
 
 # a {:system, name} tuple can be used to read from the environment
-config :fun_with_flags, :redis, {:system, "REDIS_URL"}
+config :fork_with_flags, :redis, {:system, "REDIS_URL"}
 ```
 
 [Redis Sentinel](https://redis.io/docs/manual/sentinel/) is also supported. See the [Redix docs](https://github.com/whatyouhide/redix/tree/v1.1.5#redis-sentinel) for more details.
 
 ```elixir
-config :fun_with_flags, :redis,
+config :fork_with_flags, :redis,
   sentinel: [
     sentinels: ["redis:://locahost:1234/1"],
     group: "primary",
@@ -569,13 +618,13 @@ config :fun_with_flags, :redis,
 
 ### Persistence Adapters
 
-The library comes with two persistence adapters for the [`Redix`](https://hex.pm/packages/redix) and [`Ecto`](https://hex.pm/packages/ecto) libraries, that allow to persist feature flag data in Redis, PostgreSQL or MySQL. In order to use any of them, you must declare the correct optional dependency in the Mixfile (see the [installation](#installation) instructions, above).
+The library comes with persistence adapters for the [`Redix`](https://hex.pm/packages/redix) and [`Ecto`](https://hex.pm/packages/ecto) libraries, that allow to persist feature flag data in Redis, PostgreSQL, MySQL, or SQLite. In order to use any of them, you must declare the correct optional dependency in the Mixfile (see the [installation](#installation) instructions, above).
 
 The Redis adapter is the default and there is no need to explicitly declare it. All it needs is the Redis connection configuration.
 
-In order to use the Ecto adapter, an Ecto repo must be provided in the configuration. FunWithFlags expects the Ecto repo to be initialized by the host application, which also needs to start and supervise any required processes. If using Phoenix this is managed automatically by the framework, and it's fine to use the same repo used by the rest of the application.
+In order to use the Ecto adapter, an Ecto repo must be provided in the configuration. ForkWithFlags expects the Ecto repo to be initialized by the host application, which also needs to start and supervise any required processes. If using Phoenix this is managed automatically by the framework, and it's fine to use the same repo used by the rest of the application.
 
-Only PostgreSQL (via [`postgrex`](https://hex.pm/packages/postgrex)) and MySQL (via [`mariaex`](https://hex.pm/packages/mariaex) or [`myxql`](https://hex.pm/packages/myxql)) are supported at the moment. Support for other RDBMSs might come in the future.
+Only PostgreSQL (via [`postgrex`](https://hex.pm/packages/postgrex)), MySQL (via [`mariaex`](https://hex.pm/packages/mariaex) or [`myxql`](https://hex.pm/packages/myxql)), and SQLite (via [`ecto_sqlite3`](https://hex.pm/packages/ecto_sqlite3)) are supported at the moment. Support for other RDBMSs might come in the future.
 
 To configure the Ecto adapter:
 
@@ -590,21 +639,21 @@ config :my_app, MyApp.Repo,
   hostname: "localhost",
   pool_size: 10
 
-# FunWithFlags configuration.
-config :fun_with_flags, :persistence,
-  adapter: FunWithFlags.Store.Persistent.Ecto,
+# ForkWithFlags configuration.
+config :fork_with_flags, :persistence,
+  adapter: ForkWithFlags.Store.Persistent.Ecto,
   repo: MyApp.Repo,
   ecto_table_name: "your_table_name" # optional
   # Default table name is "fun_with_flags_toggles".
 ```
 
-It's also necessary to create the DB table that will hold the feature flag data. To do that, [create a new migration](https://hexdocs.pm/ecto_sql/Mix.Tasks.Ecto.Gen.Migration.html) in your project and copy the contents of [the provided migration file](https://github.com/tompave/fun_with_flags/blob/master/priv/ecto_repo/migrations/00000000000000_create_feature_flags_table.exs). Then [run the migration](https://hexdocs.pm/ecto_sql/Mix.Tasks.Ecto.Migrate.html).
+It's also necessary to create the DB table that will hold the feature flag data. To do that, [create a new migration](https://hexdocs.pm/ecto_sql/Mix.Tasks.Ecto.Gen.Migration.html) in your project and copy the contents of [the provided migration file](https://github.com/tylerbarker/fork_with_flags/blob/master/priv/ecto_repo/migrations/00000000000000_create_feature_flags_table.exs). Then [run the migration](https://hexdocs.pm/ecto_sql/Mix.Tasks.Ecto.Migrate.html).
 
-When using the Ecto persistence adapter, FunWithFlags will annotate all queries using the [Ecto Repo Query API](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#query-api) with a custom option: `[fun_with_flags: true]`. This is done to make it easier to identify FunWithFlags queries when working with Ecto customization hooks, e.g. the [`Ecto.Repo.prepare_query/3` callback](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#c:prepare_query/3). Since this sort of annotations via custom query options are only useful with the Ecto Query API ([context](https://elixirforum.com/t/proposal-prepare-query-for-write-operations/50510)), other repo functions are not annotated with the custom option.
+When using the Ecto persistence adapter, ForkWithFlags will annotate all queries using the [Ecto Repo Query API](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#query-api) with a custom option: `[fun_with_flags: true]`. This is done to make it easier to identify ForkWithFlags queries when working with Ecto customization hooks, e.g. the [`Ecto.Repo.prepare_query/3` callback](https://hexdocs.pm/ecto/3.8.4/Ecto.Repo.html#c:prepare_query/3). Since this sort of annotations via custom query options are only useful with the Ecto Query API ([context](https://elixirforum.com/t/proposal-prepare-query-for-write-operations/50510)), other repo functions are not annotated with the custom option.
 
 #### Ecto Multi-tenancy
 
-If you followed the Ecto guide on setting up [multi-tenancy with foreign keys](https://hexdocs.pm/ecto/3.8.4/multi-tenancy-with-foreign-keys.html), you must add an exception for queries originating from FunWithFlags. As mentioned in the section above, these queries have a custom query option named `:fun_with_flags` set to `true`:
+If you followed the Ecto guide on setting up [multi-tenancy with foreign keys](https://hexdocs.pm/ecto/3.8.4/multi-tenancy-with-foreign-keys.html), you must add an exception for queries originating from ForkWithFlags. As mentioned in the section above, these queries have a custom query option named `:fork_with_flags` set to `true`:
 
 ```elixir
 # Sample code, only relevant if you followed the Ecto guide on multi tenancy with foreign keys.
@@ -616,8 +665,8 @@ defmodule MyApp.Repo do
   @impl true
   def prepare_query(_operation, query, opts) do
     cond do
-      # add the check for opts[:fun_with_flags] here:
-      opts[:skip_org_id] || opts[:schema_migration] || opts[:fun_with_flags] ->
+      # add the check for opts[:fork_with_flags] here:
+      opts[:skip_org_id] || opts[:schema_migration] || opts[:fork_with_flags] ->
         {query, opts}
 
       org_id = opts[:org_id] ->
@@ -636,8 +685,8 @@ The library comes with two PubSub adapters for the [`Redix`](https://hex.pm/pack
 
 The Redis PubSub adapter is the default and doesn't need to be explicitly configured. It can only be used in conjunction with the Redis persistence adapter however, and is not available when using Ecto for persistence. When used, it connects directly to the Redis instance used for persisting the flag data.
 
-The Phoenix PubSub adapter uses the high level API of `Phoenix.PubSub`, which means that under the hood it could use either its PG2 or Redis adapters, and this library doesn't need to know. It's provided as a convenient way to leverage distributed Erlang when using FunWithFlags in a Phoenix application, although it can be used independently (without the rest of the Phoenix framework) to add PubSub to Elixir apps running on Erlang clusters.  
-FunWithFlags expects the `Phoenix.PubSub` process to be started by the host application, and in order to use this adapter the client (name or PID) must be provided in the configuration.
+The Phoenix PubSub adapter uses the high level API of `Phoenix.PubSub`, which means that under the hood it could use either its PG2 or Redis adapters, and this library doesn't need to know. It's provided as a convenient way to leverage distributed Erlang when using ForkWithFlags in a Phoenix application, although it can be used independently (without the rest of the Phoenix framework) to add PubSub to Elixir apps running on Erlang clusters.  
+ForkWithFlags expects the `Phoenix.PubSub` process to be started by the host application, and in order to use this adapter the client (name or PID) must be provided in the configuration.
 
 For example, in Phoenix (>= 1.5.0) it would be:
 
@@ -646,10 +695,10 @@ For example, in Phoenix (>= 1.5.0) it would be:
 config :my_app, MyApp.Web.Endpoint,
   pubsub_server: MyApp.PubSub
 
-# FunWithFlags configuration
-config :fun_with_flags, :cache_bust_notifications,
+# ForkWithFlags configuration
+config :fork_with_flags, :cache_bust_notifications,
   enabled: true,
-  adapter: FunWithFlags.Notifications.PhoenixPubSub,
+  adapter: ForkWithFlags.Notifications.PhoenixPubSub,
   client: MyApp.PubSub
 ```
 
@@ -664,9 +713,9 @@ opts = [strategy: :one_for_one, name: MyApp.Supervisor]
 {:ok, _pid} = Supervisor.start_link(children, opts)
 
 # config/config.exs
-config :fun_with_flags, :cache_bust_notifications,
+config :fork_with_flags, :cache_bust_notifications,
   enabled: true,
-  adapter: FunWithFlags.Notifications.PhoenixPubSub,
+  adapter: ForkWithFlags.Notifications.PhoenixPubSub,
   client: :my_pubsub_process_name
 ```
 
@@ -676,7 +725,7 @@ config :fun_with_flags, :cache_bust_notifications,
 
 This library aims to be extensible and allows users to provide their own persistence layer.
 
-This is supported through [`FunWithFlags.Store.Persistent`](https://github.com/tompave/fun_with_flags/blob/master/lib/fun_with_flags/store/persistent.ex), a generic persistence [behaviour](https://hexdocs.pm/elixir/typespecs.html#behaviours) that is adopted by the builtin Redis and Ecto adapters.
+This is supported through [`ForkWithFlags.Store.Persistent`](https://github.com/tylerbarker/fork_with_flags/blob/master/lib/fork_with_flags/store/persistent.ex), a generic persistence [behaviour](https://hexdocs.pm/elixir/typespecs.html#behaviours) that is adopted by the builtin Redis and Ecto adapters.
 
 Custom persistence adapters can adopt the behaviour and then be configured as the persistence module in the Mix config of the user applications.
 
@@ -684,7 +733,7 @@ For example, an application can define this module:
 
 ```elixir
 defmodule MyApp.MyAlternativeFlagStore do
-  @behaviour FunWithFlags.Store.Persistent
+  @behaviour ForkWithFlags.Store.Persistent
   # implement all the behaviour's callback
 end
 ```
@@ -692,18 +741,18 @@ end
 And then configure the library to use it:
 
 ```elixir
-config :fun_with_flags, :persistence, adapter: MyApp.MyAlternativeFlagStore
+config :fork_with_flags, :persistence, adapter: MyApp.MyAlternativeFlagStore
 ```
 
 ## Application Start Behaviour
 
-As explained in the [Installation](#installation) section, above in this document, the `:fun_with_flags` application will start automatically when you add the package as a dependency in your Mixfile. The `:fun_with_flags` application starts its own supervision tree which manages all required processes and is provided by the `FunWithFlags.Supervisor` module.
+As explained in the [Installation](#installation) section, above in this document, the `:fork_with_flags` application will start automatically when you add the package as a dependency in your Mixfile. The `:fork_with_flags` application starts its own supervision tree which manages all required processes and is provided by the `ForkWithFlags.Supervisor` module.
 
-Sometimes, this can cause issues and race conditions if FunWithFlags is configured to rely on Erlang processes that are owned by another application. For example, if you have configured the `Phoenix.PubSub` cache-busting notification adapter, one of FunWithFlag's processes will immediately try to subscribe to its notifications channel using the provided PubSub process identifier. If that process is not available, FunWithFlags will retry a few times and then give up and raise an exception. This will become a problem if you're using FunWithFlags in a large application (e.g. a Phoenix app) and the `:fun_with_flags` application starts much faster than the Phoenix supervision tree.
+Sometimes, this can cause issues and race conditions if ForkWithFlags is configured to rely on Erlang processes that are owned by another application. For example, if you have configured the `Phoenix.PubSub` cache-busting notification adapter, one of FunWithFlag's processes will immediately try to subscribe to its notifications channel using the provided PubSub process identifier. If that process is not available, ForkWithFlags will retry a few times and then give up and raise an exception. This will become a problem if you're using ForkWithFlags in a large application (e.g. a Phoenix app) and the `:fork_with_flags` application starts much faster than the Phoenix supervision tree.
 
-In these cases, it's better to directly control how FunWithFlags starts its processes.
+In these cases, it's better to directly control how ForkWithFlags starts its processes.
 
-The first step is to add the `FunWithFlags.Supervisor` module directly to the supervision tree of the host application. For example, in a Phoenix app it would look like this:
+The first step is to add the `ForkWithFlags.Supervisor` module directly to the supervision tree of the host application. For example, in a Phoenix app it would look like this:
 
 ```diff
 defmodule MyPhoenixApp.Application do
@@ -716,7 +765,7 @@ defmodule MyPhoenixApp.Application do
       MyPhoenixAppWeb.Telemetry,
       {Phoenix.PubSub, name: MyPhoenixApp.PubSub},
       MyPhoenixAppWeb.Endpoint,
-+     FunWithFlags.Supervisor,
++     ForkWithFlags.Supervisor,
     ]
 
     opts = [strategy: :one_for_one, name: MyPhoenixApp.Supervisor]
@@ -726,16 +775,16 @@ defmodule MyPhoenixApp.Application do
   # ...
 ```
 
-Then it's necessary to configure the Mix project to not start the `:fun_with_flags` application automatically. This can be accomplished in the Mixfile in a number of ways, for example: (**Note**: These are alternative solutions, you don't need to do both. You must decide which is more appropriate for your setup.)
+Then it's necessary to configure the Mix project to not start the `:fork_with_flags` application automatically. This can be accomplished in the Mixfile in a number of ways, for example: (**Note**: These are alternative solutions, you don't need to do both. You must decide which is more appropriate for your setup.)
 
-* **Option A**: Declare the `:fun_with_flags` dependency with either the `runtime: false` or `app: false` options. ([docs](https://hexdocs.pm/mix/1.11.3/Mix.Tasks.Deps.html#module-dependency-definition-options))
+* **Option A**: Declare the `:fork_with_flags` dependency with either the `runtime: false` or `app: false` options. ([docs](https://hexdocs.pm/mix/1.11.3/Mix.Tasks.Deps.html#module-dependency-definition-options))
 
 ```diff
-- {:fun_with_flags, "~> 1.6"},
-+ {:fun_with_flags, "~> 1.6", runtime: false},
+- {:fork_with_flags, "~> 1.6"},
++ {:fork_with_flags, "~> 1.6", runtime: false},
 ```
 
-If you use releases then you'll also need to modify the `releases` section in `mix.exs` so that it loads the `fun_with_flags` application explicitly (since `runtime: false` / `app: false` will exclude it from the assembled release).
+If you use releases then you'll also need to modify the `releases` section in `mix.exs` so that it loads the `fork_with_flags` application explicitly (since `runtime: false` / `app: false` will exclude it from the assembled release).
 
 ```diff
 def project do
@@ -744,40 +793,42 @@ def project do
 +   releases: [
 +     my_phoenix_app: [
 +       applications: [
-+         fun_with_flags: :load
++         fork_with_flags: :load
 +       ]
 +    ]
   ]
 end
 ```
 
-* **Option B**: Declare that the `:fun_with_flags` application is managed directly by your host application ([docs](https://hexdocs.pm/mix/1.11.3/Mix.Tasks.Compile.App.html)).
+* **Option B**: Declare that the `:fork_with_flags` application is managed directly by your host application ([docs](https://hexdocs.pm/mix/1.11.3/Mix.Tasks.Compile.App.html)).
 
 ```diff
   def application do
     [
       mod: {MyPhoenixApp.Application, []},
-+     included_applications: [:fun_with_flags],
++     included_applications: [:fork_with_flags],
       extra_applications: [:logger, :runtime_tools]
     ]
   end
 ```
 
-The result of those changes is that the `:fun_with_flags` application won't be loaded and started automatically, and therefore the FunWithFlags supervision tree won't risk to be started before the other processes in the host Phoenix application. Rather, the supervision tree will start alongside the other core Phoenix processes.
+The result of those changes is that the `:fork_with_flags` application won't be loaded and started automatically, and therefore the ForkWithFlags supervision tree won't risk to be started before the other processes in the host Phoenix application. Rather, the supervision tree will start alongside the other core Phoenix processes.
 
-One final note on this topic is that if you're also using [`FunWithFlags.UI`](https://github.com/tompave/fun_with_flags_ui) (refer to the [Web Dashboard](#web-dashboard) section, above in this document), then that will need to be configured as well. The reason is that `:fun_with_flags` is a dependency of `:fun_with_flags_ui`, so including the latter as a dependency will cause the former to be auto-started despite the configuration described above. To avoid this, the same configuration should be used for the `:fun_with_flags_ui` dependency, regardless of the approach used (Option A: `runtime: false`, `app: false`; or Option B: `included_applications`).
+One final note on this topic is that if you're also using [`ForkWithFlags.UI`](https://github.com/tylerbarker/fork_with_flags_ui) (refer to the [Web Dashboard](#web-dashboard) section, above in this document), then that will need to be configured as well. The reason is that `:fork_with_flags` is a dependency of `:fork_with_flags_ui`, so including the latter as a dependency will cause the former to be auto-started despite the configuration described above. To avoid this, the same configuration should be used for the `:fork_with_flags_ui` dependency, regardless of the approach used (Option A: `runtime: false`, `app: false`; or Option B: `included_applications`).
 
 
 ## Testing
 
-This library depends on Redis, PostgreSQL and MySQL, and you'll need them installed and running on your system in order to run the complete test suite. The tests will use the [Redis db number 5](https://github.com/tompave/fun_with_flags/blob/master/test/support/test_utils.ex#L4) and then clean after themselves, but it's safer to start Redis in a directory where there is no `dump.rdb` file you care about to avoid issues. The Ecto tests will use the SQL sandbox and all transactions will be automatically rolled back.
+This library depends on Redis, PostgreSQL and MySQL, and you'll need them installed and running on your system in order to run the complete test suite. The tests will use the [Redis db number 5](https://github.com/tylerbarker/fork_with_flags/blob/master/test/support/test_utils.ex#L4) and then clean after themselves, but it's safer to start Redis in a directory where there is no `dump.rdb` file you care about to avoid issues. The Ecto tests will use the SQL sandbox and all transactions will be automatically rolled back.
 
 To setup the test DB for the Ecto persistence tests, run:
 
 ```
 MIX_ENV=test PERSISTENCE=ecto mix do ecto.create, ecto.migrate              # for postgres
-rm -rf _build/test/lib/fun_with_flags/
+rm -rf _build/test/lib/fork_with_flags/
 MIX_ENV=test PERSISTENCE=ecto RDBMS=mysql mix do ecto.create, ecto.migrate  # for mysql
+rm -rf _build/test/lib/fork_with_flags/
+MIX_ENV=test PERSISTENCE=ecto RDBMS=sqlite mix do ecto.create, ecto.migrate  # for sqlite
 ```
 
 Then, to run all the tests:
@@ -791,11 +842,11 @@ The Mixfile defines a few other helper tasks that allow to run the test suite wi
 
 ## Development
 
-Like for testing, developing FunWithFlags requires local installations of Redis, PostgreSQL and MySQL. For work that doesn't touch the persistence adapters too closely, it's possibly simpler to just run FunWithFlags with Redis and then let CI run the tests with the other adapters.
+Like for testing, developing ForkWithFlags requires local installations of Redis, PostgreSQL and MySQL. For work that doesn't touch the persistence adapters too closely, it's possibly simpler to just run ForkWithFlags with Redis and then let CI run the tests with the other adapters.
 
 A common workflow is to run the tests and interact with the package API in `iex`.
 
-With the [default configuration](https://github.com/tompave/fun_with_flags/blob/master/config/config.exs), `iex -S mix` will compile and load FunWithFlags with Redis persistence and Redis PubSub. To compile and run the package in `iex` with Ecto and Phoenix PubSub support instead, use these commands:
+With the [default configuration](https://github.com/tylerbarker/fork_with_flags/blob/master/config/config.exs), `iex -S mix` will compile and load ForkWithFlags with Redis persistence and Redis PubSub. To compile and run the package in `iex` with Ecto and Phoenix PubSub support instead, use these commands:
 
 ```shell
 bin/console_ecto postgres

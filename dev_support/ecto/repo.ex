@@ -1,5 +1,5 @@
-if FunWithFlags.Config.persist_in_ecto? do
-  defmodule FunWithFlags.Dev.EctoRepo do
+if ForkWithFlags.Config.persist_in_ecto? do
+  defmodule ForkWithFlags.Dev.EctoRepo do
 
     # Only for dev and test.
     #
@@ -7,19 +7,21 @@ if FunWithFlags.Config.persist_in_ecto? do
       "mysql" ->
         # Ecto.Adapters.MySQL # mariaex, legacy
         Ecto.Adapters.MyXQL # myxql, introduced in ecto_sql 3.1
-      _ ->
+      "sqlite" ->
+        Ecto.Adapters.SQLite3
+        _ ->
         Ecto.Adapters.Postgres
     end)
 
-    use Ecto.Repo, otp_app: :fun_with_flags, adapter: @variant
+    use Ecto.Repo, otp_app: :fork_with_flags, adapter: @variant
 
     # For testing setups that use multi-tenancy using foreign keys
     # as described in the Ecto docs:
     # https://hexdocs.pm/ecto/3.8.4/multi-tenancy-with-foreign-keys.html
     #
-    # FunWithFlags sets the custom query option `:fun_with_flags` to
+    # ForkWithFlags sets the custom query option `:fork_with_flags` to
     # `true` to allow such setups to detect queries originating from
-    # FunWithFlags.
+    # ForkWithFlags.
     #
     # This dev/repo implements the callback simplu as a detection mechanism:
     # if the package code changed to remove the custom query option, this will

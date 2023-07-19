@@ -1,35 +1,34 @@
-defmodule FunWithFlags.Mixfile do
+defmodule ForkWithFlags.Mixfile do
   use Mix.Project
 
-  @source_url "https://github.com/tompave/fun_with_flags"
-  @version "1.10.1"
+  @source_url "https://github.com/tylerbarker/fork_with_flags"
+  @version "1.11.1"
 
   def project do
     [
-      app: :fun_with_flags,
+      app: :fork_with_flags,
       version: @version,
       elixir: "~> 1.12",
-      elixirc_paths: elixirc_paths(Mix.env),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
       package: package(),
       docs: docs(),
       aliases: aliases(),
-      dialyzer: dialyzer(),
+      dialyzer: dialyzer()
     ]
   end
 
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: extra_applications(Mix.env),
-     mod: {FunWithFlags.Application, []}]
+    [extra_applications: extra_applications(Mix.env()), mod: {ForkWithFlags.Application, []}]
   end
 
   defp extra_applications(:test), do: local_extra_applications()
-  defp extra_applications(:dev),  do: local_extra_applications()
-  defp extra_applications(_),     do: [:logger]
+  defp extra_applications(:dev), do: local_extra_applications()
+  defp extra_applications(_), do: [:logger]
 
   # When working locally with the Ecto adapter, start the ecto_sql
   # and postgrex applications. They're not started automatically
@@ -60,12 +59,11 @@ defmodule FunWithFlags.Mixfile do
     [
       {:redix, "~> 1.0", optional: true},
       {:ecto_sql, "~> 3.0", optional: true},
+      {:ecto_sqlite3, "~> 0.9", optional: true, only: [:dev, :test]},
       {:postgrex, "~> 0.16", optional: true, only: [:dev, :test]},
       {:myxql, "~> 0.2", optional: true, only: [:dev, :test]},
       {:phoenix_pubsub, "~> 2.0", optional: true},
-
       {:mock, "~> 0.3", only: :test},
-
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false}
@@ -75,7 +73,7 @@ defmodule FunWithFlags.Mixfile do
   defp dialyzer do
     [
       # Add optional dependencies to avoid "unknown_function" warnings.
-      plt_add_apps: [:redix, :ecto, :ecto_sql, :phoenix_pubsub],
+      plt_add_apps: [:redix, :ecto, :ecto_sql, :phoenix_pubsub]
     ]
   end
 
@@ -85,7 +83,8 @@ defmodule FunWithFlags.Mixfile do
       {:"test.phx", [&run_tests__redis_pers__phoenix_pubsub/1]},
       {:"test.ecto.postgres", [&run_tests__ecto_pers_postgres__phoenix_pubsub/1]},
       {:"test.ecto.mysql", [&run_tests__ecto_pers_mysql__phoenix_pubsub/1]},
-      {:"test.redis", [&run_tests__redis_pers__redis_pubsub/1]},
+      {:"test.ecto.sqlite", [&run_tests__ecto_pers_sqlite__phoenix_pubsub/1]},
+      {:"test.redis", [&run_tests__redis_pers__redis_pubsub/1]}
     ]
   end
 
@@ -94,18 +93,27 @@ defmodule FunWithFlags.Mixfile do
   #
   defp run_all_tests(arg) do
     tests = [
-      &run_tests__redis_pers__redis_pubsub/1, &run_integration_tests__redis_pers__redis_pubsub__no_cache/1,
-      &run_tests__redis_pers__phoenix_pubsub/1, &run_integration_tests__redis_pers__phoenix_pubsub__no_cache/1,
-      &run_tests__ecto_pers_postgres__phoenix_pubsub/1, &run_integration_tests__ecto_pers_postgres__phoenix_pubsub__no_cache/1,
-      &run_tests__ecto_pers_mysql__phoenix_pubsub/1, &run_integration_tests__ecto_pers_mysql__phoenix_pubsub__no_cache/1,
+      &run_tests__redis_pers__redis_pubsub/1,
+      &run_integration_tests__redis_pers__redis_pubsub__no_cache/1,
+      &run_tests__redis_pers__phoenix_pubsub/1,
+      &run_integration_tests__redis_pers__phoenix_pubsub__no_cache/1,
+      &run_tests__ecto_pers_postgres__phoenix_pubsub/1,
+      &run_integration_tests__ecto_pers_postgres__phoenix_pubsub__no_cache/1,
+      &run_tests__ecto_pers_mysql__phoenix_pubsub/1,
+      &run_integration_tests__ecto_pers_mysql__phoenix_pubsub__no_cache/1,
+      &run_tests__ecto_pers_sqlite__phoenix_pubsub/1,
+      &run_integration_tests__ecto_pers_sqlite__phoenix_pubsub__no_cache/1
     ]
 
-    exit_codes = case System.get_env("CI") do
-      "true" ->
-        tests |> Enum.map(fn test_fn -> _run_test_with_retries(3, 500, fn -> test_fn.(arg) end) end)
-      _ ->
-        tests |> Enum.map(fn test_fn -> test_fn.(arg) end)
-    end
+    exit_codes =
+      case System.get_env("CI") do
+        "true" ->
+          tests
+          |> Enum.map(fn test_fn -> _run_test_with_retries(3, 500, fn -> test_fn.(arg) end) end)
+
+        _ ->
+          tests |> Enum.map(fn test_fn -> test_fn.(arg) end)
+      end
 
     if Enum.any?(exit_codes, &(&1 != 0)) do
       require Logger
@@ -117,9 +125,15 @@ defmodule FunWithFlags.Mixfile do
   # Because some tests are flaky in CI.
   #
   defp _run_test_with_retries(attempts, sleep_ms, test_fn) when attempts > 0 do
-    IO.puts("---\nRunning a test task with retries. Attempts left: #{attempts}, sleep ms: #{sleep_ms}.\n---")
+    IO.puts(
+      "---\nRunning a test task with retries. Attempts left: #{attempts}, sleep ms: #{sleep_ms}.\n---"
+    )
+
     case test_fn.() do
-      0 -> 0 # Successful run, simply return the status.
+      # Successful run, simply return the status.
+      0 ->
+        0
+
       _ ->
         :timer.sleep(sleep_ms)
         remaining = attempts - 1
@@ -138,10 +152,10 @@ defmodule FunWithFlags.Mixfile do
   # Cache enabled, force re-compilation.
   #
   defp run_tests__redis_pers__redis_pubsub(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --exclude phoenix_pubsub --exclude ecto_persistence #{arg}",
       env: [
-        {"CACHE_ENABLED", "true"},
+        {"CACHE_ENABLED", "true"}
       ]
     )
   end
@@ -150,10 +164,10 @@ defmodule FunWithFlags.Mixfile do
   # Cache disabled, Redis as persistent store and Redis PubSub as broker.
   #
   defp run_integration_tests__redis_pers__redis_pubsub__no_cache(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --only integration #{arg}",
       env: [
-        {"CACHE_ENABLED", "false"},
+        {"CACHE_ENABLED", "false"}
       ]
     )
   end
@@ -161,11 +175,11 @@ defmodule FunWithFlags.Mixfile do
   # Run the tests with Redis as persistent store and Phoenix.PubSub as broker.
   #
   defp run_tests__redis_pers__phoenix_pubsub(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --exclude redis_pubsub --exclude ecto_persistence #{arg}",
       env: [
         {"CACHE_ENABLED", "true"},
-        {"PUBSUB_BROKER", "phoenix_pubsub"},
+        {"PUBSUB_BROKER", "phoenix_pubsub"}
       ]
     )
   end
@@ -174,11 +188,11 @@ defmodule FunWithFlags.Mixfile do
   # Cache disabled, Redis as persistent store and Phoenix.PubSubas broker.
   #
   defp run_integration_tests__redis_pers__phoenix_pubsub__no_cache(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --only integration #{arg}",
       env: [
         {"CACHE_ENABLED", "false"},
-        {"PUBSUB_BROKER", "phoenix_pubsub"},
+        {"PUBSUB_BROKER", "phoenix_pubsub"}
       ]
     )
   end
@@ -186,13 +200,13 @@ defmodule FunWithFlags.Mixfile do
   # Run the tests with Ecto+PostgreSQL as persistent store and Phoenix.PubSub as broker.
   #
   defp run_tests__ecto_pers_postgres__phoenix_pubsub(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --exclude redis_pubsub --exclude redis_persistence #{arg}",
       env: [
         {"CACHE_ENABLED", "true"},
         {"PUBSUB_BROKER", "phoenix_pubsub"},
         {"PERSISTENCE", "ecto"},
-        {"RDBMS", "postgres"},
+        {"RDBMS", "postgres"}
       ]
     )
   end
@@ -200,13 +214,27 @@ defmodule FunWithFlags.Mixfile do
   # Run the tests with Ecto+MySQL as persistent store and Phoenix.PubSub as broker.
   #
   defp run_tests__ecto_pers_mysql__phoenix_pubsub(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --exclude redis_pubsub --exclude redis_persistence #{arg}",
       env: [
         {"CACHE_ENABLED", "true"},
         {"PUBSUB_BROKER", "phoenix_pubsub"},
         {"PERSISTENCE", "ecto"},
-        {"RDBMS", "mysql"},
+        {"RDBMS", "mysql"}
+      ]
+    )
+  end
+
+  # Run the tests with Ecto+SQLite as persistent store and Phoenix.PubSub as broker.
+  #
+  defp run_tests__ecto_pers_sqlite__phoenix_pubsub(arg) do
+    Mix.shell().cmd(
+      "mix test --color --force --exclude redis_pubsub --exclude redis_persistence #{arg}",
+      env: [
+        {"CACHE_ENABLED", "true"},
+        {"PUBSUB_BROKER", "phoenix_pubsub"},
+        {"PERSISTENCE", "ecto"},
+        {"RDBMS", "sqlite"}
       ]
     )
   end
@@ -215,13 +243,13 @@ defmodule FunWithFlags.Mixfile do
   # Cache disabled, Ecto+PostgreSQL as persistent store and Phoenix.PubSub as broker.
   #
   defp run_integration_tests__ecto_pers_postgres__phoenix_pubsub__no_cache(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --only integration #{arg}",
       env: [
         {"CACHE_ENABLED", "false"},
         {"PUBSUB_BROKER", "phoenix_pubsub"},
         {"PERSISTENCE", "ecto"},
-        {"RDBMS", "postgres"},
+        {"RDBMS", "postgres"}
       ]
     )
   end
@@ -230,31 +258,47 @@ defmodule FunWithFlags.Mixfile do
   # Cache disabled, Ecto+MySQL as persistent store and Phoenix.PubSub as broker.
   #
   defp run_integration_tests__ecto_pers_mysql__phoenix_pubsub__no_cache(arg) do
-    Mix.shell.cmd(
+    Mix.shell().cmd(
       "mix test --color --force --only integration #{arg}",
       env: [
         {"CACHE_ENABLED", "false"},
         {"PUBSUB_BROKER", "phoenix_pubsub"},
         {"PERSISTENCE", "ecto"},
-        {"RDBMS", "mysql"},
+        {"RDBMS", "mysql"}
+      ]
+    )
+  end
+
+  # Runs the integration tests only.
+  # Cache disabled, Ecto+SQLite as persistent store and Phoenix.PubSub as broker.
+  #
+  defp run_integration_tests__ecto_pers_sqlite__phoenix_pubsub__no_cache(arg) do
+    Mix.shell().cmd(
+      "mix test --color --force --only integration #{arg}",
+      env: [
+        {"CACHE_ENABLED", "false"},
+        {"PUBSUB_BROKER", "phoenix_pubsub"},
+        {"PERSISTENCE", "ecto"},
+        {"RDBMS", "sqlite"}
       ]
     )
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support", "dev_support"]
   defp elixirc_paths(:dev), do: ["lib", "dev_support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp description do
     """
-    FunWithFlags, a flexible and fast feature toggle library for Elixir.
+    ForkWithFlags, a fork of the flexible and fast feature toggle library for Elixir.
     """
   end
 
   defp package do
     [
       maintainers: [
-        "Tommaso Pavese"
+        "Tommaso Pavese",
+        "Tyler Barker"
       ],
       licenses: [
         "MIT"
@@ -269,7 +313,7 @@ defmodule FunWithFlags.Mixfile do
   defp docs do
     [
       extras: ["README.md", "CHANGELOG.md"],
-      main: "FunWithFlags",
+      main: "ForkWithFlags",
       source_url: @source_url,
       source_ref: "v#{@version}"
     ]
