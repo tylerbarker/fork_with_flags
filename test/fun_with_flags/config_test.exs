@@ -61,7 +61,7 @@ defmodule ForkWithFlags.ConfigTest do
     assert true == Config.cache?
 
     # can be configured
-    Application.put_all_env(:fork_with_flags [cache: [enabled: false]])
+    Application.put_all_env(fork_with_flags: [cache: [enabled: false]])
     assert false == Config.cache?
 
     # cleanup
@@ -75,7 +75,7 @@ defmodule ForkWithFlags.ConfigTest do
     assert 60 = Config.cache_ttl
 
     # can be configured
-    Application.put_all_env(:fork_with_flags [cache: [ttl: 3600]])
+    Application.put_all_env(fork_with_flags: [cache: [ttl: 3600]])
     assert 3600 = Config.cache_ttl
 
     # cleanup
@@ -178,7 +178,7 @@ defmodule ForkWithFlags.ConfigTest do
     end
 
     test "returns false if the cache is disabled" do
-      Application.put_all_env(:fork_with_flags [cache: [enabled: false]])
+      Application.put_all_env(fork_with_flags: [cache: [enabled: false]])
       refute Config.change_notifications_enabled?
 
       # cleanup
@@ -189,7 +189,7 @@ defmodule ForkWithFlags.ConfigTest do
     test "returns false if no notification adapter is configured" do
       original_adapter = Config.notifications_adapter()
       original_client = Config.pubsub_client
-      Application.put_all_env(:fork_with_flags [cache_bust_notifications: [adapter: nil]])
+      Application.put_all_env(fork_with_flags: [cache_bust_notifications: [adapter: nil]])
       refute Config.change_notifications_enabled?
 
       # cleanup
@@ -200,7 +200,7 @@ defmodule ForkWithFlags.ConfigTest do
     test "returns false if it's explicitly disabled" do
       original_adapter = Config.notifications_adapter()
       original_client = Config.pubsub_client
-      Application.put_all_env(:fork_with_flags [cache_bust_notifications: [enabled: false]])
+      Application.put_all_env(fork_with_flags: [cache_bust_notifications: [enabled: false]])
       refute Config.change_notifications_enabled?
 
       # cleanup
@@ -210,11 +210,11 @@ defmodule ForkWithFlags.ConfigTest do
   end
 
   defp reset_cache_defaults do
-    Application.put_all_env(:fork_with_flags [cache: [enabled: true, ttl: 60]])
+    Application.put_all_env(fork_with_flags: [cache: [enabled: true, ttl: 60]])
   end
 
   defp reset_notifications_defaults(adapter, client) do
-    Application.put_all_env(:fork_with_flags [
+    Application.put_all_env(fork_with_flags: [
       cache_bust_notifications: [
         enabled: true, adapter: adapter, client: client
       ]

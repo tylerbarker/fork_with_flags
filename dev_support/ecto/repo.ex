@@ -30,7 +30,7 @@ if ForkWithFlags.Config.persist_in_ecto? do
     @impl true
     def prepare_query(_operation, query, opts) do
       cond do
-        opts[:schema_migration] || opts[:fork_with_flags] ->
+        opts[:schema_migration] || opts[:fun_with_flags] ->
           {query, opts}
 
         true ->
