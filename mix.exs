@@ -59,8 +59,8 @@ defmodule ForkWithFlags.Mixfile do
   defp deps do
     [
       {:redix, "~> 1.0", optional: true},
-      {:ecto_sql, "~> 3.10", optional: true},
-      {:ecto_sqlite3, "~> 0.10", optional: true, only: [:dev, :test]},
+      {:ecto_sql, "~> 3.0", optional: true},
+      {:ecto_sqlite3, "~> 0.9", optional: true, only: [:dev, :test]},
       {:postgrex, "~> 0.16", optional: true, only: [:dev, :test]},
       {:myxql, "~> 0.2", optional: true, only: [:dev, :test]},
       {:phoenix_pubsub, "~> 2.0", optional: true},
