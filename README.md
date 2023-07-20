@@ -25,7 +25,7 @@ A few things you'll have to do to integrate the fork...
 
 ### 0. Don't change the table names
 
-To ease migration to the fork, I've intentionally not changed anything about the default migrations and table names. The default table name remains `fun_with_flags_toggles`. So, when it comes to replacing `fun_with_flags` all over the place, keep the `ecto_table_name: "fun_with_flags_toggles"` config intact - unless you're already using a custom name.
+To ease migration to the fork, **I've intentionally not changed anything about the default migrations and table names and Redis DB names**. The default table name remains `fun_with_flags_toggles` (`fun_with_flags` for Redis). So, when it comes to replacing `fun_with_flags` all over the place, keep the `ecto_table_name: "fun_with_flags_toggles"` config intact - unless you're already using a custom name.
 
 ### 1. Switch packages in mix.exs
 
