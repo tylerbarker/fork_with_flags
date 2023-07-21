@@ -38,8 +38,8 @@ mix deps.unlock fun_with_flags_ui # if necessary
 Then update the package names and install, re-compile, etc:
 
 ```elixir
-{:fork_with_flags, "~> 1.11.1"},
-{:fork_with_flags_ui, "~> 0.8.1"}, # if necessary
+{:fork_with_flags, "~> 1.11.2"},
+{:fork_with_flags_ui, "~> 0.8.2"}, # if necessary
 ```
 
 ### 2. Replace fun_with_flags -> fork_with_flags
